@@ -20,4 +20,7 @@ public class CoolProperties {
     // 文件配置
     @NestedConfigurationProperty
     private FileProperties file;
+    
+    @NestedConfigurationProperty
+    private SysParamConfig SysParam;
 }

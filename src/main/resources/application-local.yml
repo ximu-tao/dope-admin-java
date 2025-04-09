@@ -22,6 +22,9 @@ auto-table:
 
 # Cool相关配置
 cool:
+  sysParam:
+    allowKeys:
+      - epsFieldType
   # 初始化数据
   initData: true
 

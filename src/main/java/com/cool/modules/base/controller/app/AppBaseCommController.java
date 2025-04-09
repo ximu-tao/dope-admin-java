@@ -3,6 +3,7 @@ package com.cool.modules.base.controller.app;
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
 import com.cool.core.annotation.TokenIgnore;
+import com.cool.core.config.CoolProperties;
 import com.cool.core.eps.CoolEps;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.file.FileUploadStrategyFactory;
@@ -34,8 +35,7 @@ public class AppBaseCommController {
 
     private final BaseSysParamService baseSysParamService;
 
-    @Value("${cool.sysParam.allowKeys:[]}")
-    private List<String> allowKeys;
+    final private CoolProperties coolProperties;
 
     final private FileUploadStrategyFactory fileUploadStrategyFactory;
 
@@ -44,6 +44,7 @@ public class AppBaseCommController {
     @GetMapping("/param")
     public R param(@RequestAttribute() JSONObject requestParams) {
         String key = requestParams.get("key", String.class);
+        List<String> allowKeys = coolProperties.getSysParam().getAllowKeys();
         CoolPreconditions.check(!allowKeys.contains(key), "非法操作");
         return R.ok(baseSysParamService.dataByKey(key));
     }
