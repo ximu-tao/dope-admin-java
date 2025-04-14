@@ -1,6 +1,7 @@
 package com.cool.core.base;
 
 import cn.hutool.json.JSONObject;
+import com.cool.core.request.PageParams;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
@@ -172,4 +173,51 @@ public interface BaseService<T> extends IService<T> {
      * @param type          修改类型
      */
     void modifyBefore(JSONObject requestParams, T t, ModifyEnum type);
+
+
+    /**
+     * App端 新增数据
+     * @param entity
+     * @return 数据ID
+     */
+    Long create( T entity);
+
+
+    /**
+     * App端 删除数据
+     * @param entity
+     * @return
+     */
+    Boolean delete(T entity);
+    
+    /**
+     * App端 修改数据
+     * @param entity
+     * @return
+     */
+    Boolean modify( T entity );
+    
+    
+    /**
+     * APP端查询
+     */
+    Page<T> lists( PageParams<T> pageParams );
+    
+    /**
+     * APP端查询我的数据
+     */
+    Page<T> myList( PageParams<T> pageParams );
+    
+    /**
+     * APP端查询数据详情
+     */
+    T details( Long id );
+    
+    
+    /**
+     * APP端查询我的数据详情
+     */
+    T myDetails( Long id );
+    
+    
 }
