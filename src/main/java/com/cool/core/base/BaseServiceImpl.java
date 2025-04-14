@@ -1,6 +1,8 @@
 package com.cool.core.base;
 
 import cn.hutool.json.JSONObject;
+import com.cool.core.exception.CoolPreconditions;
+import com.cool.core.request.PageParams;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -8,6 +10,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 基础service实现类
@@ -133,5 +136,76 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     @Override
     public void modifyBefore(JSONObject requestParams, T t, ModifyEnum type) {
 
+    }
+
+    @Override
+    public Long create(T entity) {
+        this.modifyBefore( null , entity, ModifyEnum.ADD);
+        Long add = this.add(entity);
+        this.modifyAfter( null , entity, ModifyEnum.ADD);
+        return add;
+    }
+
+    @Override
+    public Boolean delete(T entity) {
+        this.modifyBefore( null , entity, ModifyEnum.DELETE );
+        
+        if ( entity.getId() == null || entity.getId() <= 0 ) {
+            CoolPreconditions.alwaysThrow("仅支持通过ID删除");
+        }
+        boolean delete = this.delete( entity.getId());
+        
+        this.modifyAfter( null , entity, ModifyEnum.DELETE );
+        return delete;
+    }
+
+    @Override
+    public Boolean modify(T entity) {
+        this.modifyBefore( null , entity, ModifyEnum.UPDATE);
+        boolean update = this.update(entity);
+        this.modifyAfter( null , entity, ModifyEnum.UPDATE);
+        return update;
+    }
+    
+    public QueryWrapper listsBefore(PageParams<T> pageParams){
+        T requestParams = pageParams.getParams();
+        return QueryWrapper.create(requestParams)
+                    .orderBy( pageParams.getOrderBy() ,
+                            pageParams.getOrder().toUpperCase(Locale.ENGLISH).equals("ASC"));
+    }
+    
+    public void listsAfter(PageParams<T> pageParams ,  Page<T> page ){}
+    
+    @Override
+    public Page<T> lists(PageParams<T> pageParams) {
+        Page<T> tPage = this.mapper.paginateWithRelations(pageParams.toPage(), listsBefore(pageParams) );
+        this.listsAfter(pageParams, tPage);
+        return tPage;
+    }
+
+    @Override
+    public Page<T> myList(PageParams<T> pageParams) {
+        Page<T> tPage = this.mapper.paginateWithRelations(pageParams.toPage(), listsBefore(pageParams) );
+        this.listsAfter(pageParams, tPage);
+        return tPage;
+    }
+    
+    public void detailsBefore( Long id){}
+    public void detailsyAfter( T t){}
+    
+    @Override
+    public T details(Long id) {
+        this.detailsBefore(id);
+        T byId = this.getById(id);
+        this.detailsyAfter( byId );
+        return byId;
+    }
+
+    @Override
+    public T myDetails(Long id) {
+        this.detailsBefore(id);
+        T byId = this.getById(id);
+        this.detailsyAfter( byId );
+        return byId;
     }
 }
