@@ -1,16 +1,27 @@
 package com.cool.core.base;
 
+import cn.hutool.core.util.TypeUtil;
 import cn.hutool.json.JSONObject;
+import com.cool.core.annotation.ListSelectField;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.PageParams;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.table.TableInfo;
+import com.mybatisflex.core.table.TableInfoFactory;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import static org.apache.commons.lang3.reflect.FieldUtils.getFieldsWithAnnotation;
 
 /**
  * 基础service实现类
@@ -21,6 +32,61 @@ import java.util.Locale;
 public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> extends
     ServiceImpl<M, T>
     implements BaseService<T> {
+
+
+    protected Class<T> entityClass;
+
+    protected QueryColumn[] selectField;
+
+    public Class<T> currentEntityClass() {
+        if (entityClass != null) {
+            return this.entityClass;
+        }
+        // 使用  获取泛型参数类型
+        Type type = TypeUtil.getTypeArgument(this.getClass(), 1); // 获取第二个泛型参数
+        if (type instanceof Class<?>) {
+            entityClass = (Class<T>) type;
+            return entityClass;
+        }
+        throw new IllegalStateException("Unable to determine entity class type");
+    }
+
+
+    protected Field[] getAllDeclaredFields(Class<T> clazz) {
+        List<Field> fields = new ArrayList<>();
+        // 遍历当前类及所有父类
+        for (Class<?> currentClass = clazz; currentClass != null && currentClass != Object.class; currentClass = currentClass.getSuperclass()) {
+            fields.addAll(Arrays.asList(currentClass.getDeclaredFields()));
+        }
+        return fields.toArray(new Field[0]);
+    }
+
+
+    protected QueryColumn[] getListSelectField() {
+        if (selectField != null) {
+            return selectField;
+        }
+
+        List<QueryColumn> selectFieldList = new ArrayList<QueryColumn>();
+
+        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+
+        Arrays.stream(this.getAllDeclaredFields(entityClass))
+                .filter(field -> {
+                    ListSelectField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, ListSelectField.class);
+                    if ( fieldInfo == null ) {
+                        return true;
+                    }
+                    return !fieldInfo.hidden();
+                })
+                .forEach(field -> {
+                    String name = field.getName();
+                    selectFieldList.add(tableInfo.getQueryColumnByProperty(name));
+                });
+        this.selectField = selectFieldList.toArray(new QueryColumn[0]);
+        return selectField;
+    }
+
 
     @Override
     public Long add(T entity) {
@@ -166,12 +232,31 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         this.modifyAfter( null , entity, ModifyEnum.UPDATE);
         return update;
     }
-    
-    public QueryWrapper listsBefore(PageParams<T> pageParams){
-        T requestParams = pageParams.getParams();
-        return QueryWrapper.create(requestParams)
-                    .orderBy( pageParams.getOrderBy() ,
-                            pageParams.getOrder().toUpperCase(Locale.ENGLISH).equals("ASC"));
+
+    public QueryWrapper listsBefore(PageParams<T> pageParams) {
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .orderBy(pageParams.getOrderBy(), pageParams.getOrder().toUpperCase(Locale.ENGLISH).equals("ASC"))
+                .select(this.getListSelectField());
+
+        try {
+            T params = pageParams.getParams();
+            TableInfo tableInfo = TableInfoFactory.ofEntityClass(params.getClass());
+
+            for (Field field : params.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = field.get(params);
+
+                if (value != null) {
+                    QueryColumn queryColumnByProperty = tableInfo.getQueryColumnByProperty(field.getName());
+
+                    queryWrapper.and(queryColumnByProperty.eq(value));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add conditions", e);
+        }
+
+        return queryWrapper;
     }
     
     public void listsAfter(PageParams<T> pageParams ,  Page<T> page ){}
