@@ -36,7 +36,7 @@ public class CoolSecurityUtil {
         JSONObject tokenInfo = requestParams.getJSONObject("tokenInfo");
         if (tokenInfo != null) {
             tokenInfo.set("department",
-                coolCache.get("admin:department:" + tokenInfo.get("userId")));
+                    coolCache.get("admin:department:" + tokenInfo.get("userId")));
             tokenInfo.set("roleIds", coolCache.get("admin:roleIds:" + tokenInfo.get("userId")));
         }
         return tokenInfo;
@@ -50,7 +50,7 @@ public class CoolSecurityUtil {
      */
     public static void adminLogout(Long adminUserId, String username) {
         coolCache.del("admin:department:" + adminUserId, "admin:passwordVersion:" + adminUserId,
-            "admin:userInfo:" + adminUserId, "admin:userDetails:" + username);
+                "admin:userInfo:" + adminUserId, "admin:userDetails:" + username);
     }
 
     /**
@@ -93,10 +93,22 @@ public class CoolSecurityUtil {
         return UserTypeEnum.UNKNOWN;
     }
 
+    public static Boolean isLogin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                return true;
+            }
+        }
+        // 还未登录,未知类型
+        return false;
+    }
+
     /**
      * app退出登录,移除缓存信息
      */
     public static void appLogout() {
-        coolCache.del("app:userDetails"+ getCurrentUserId());
+        coolCache.del("app:userDetails" + getCurrentUserId());
     }
 }

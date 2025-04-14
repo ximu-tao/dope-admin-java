@@ -41,11 +41,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        if (PathUtils.isMatch(ignoredUrlsProperties.getAdminAuthUrls(), requestURI)) {
-            // 请求路径在忽略后台鉴权url里支持通配符，放行
-            chain.doFilter(request, response);
-            return;
-        }
         String authToken = request.getHeader("Authorization");
         if (!StrUtil.isEmpty(authToken)) {
             JWT jwt = jwtTokenUtil.getTokenInfo(authToken);
@@ -57,6 +52,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             } else {
                 // admin
                 handlerAdminRequest(request, jwt, authToken);
+            }
+        }else {
+            if (PathUtils.isMatch(ignoredUrlsProperties.getAdminAuthUrls(), requestURI)) {
+                // 请求路径在忽略后台鉴权url里支持通配符，放行
+                chain.doFilter(request, response);
+                return;
             }
         }
         chain.doFilter(request, response);
