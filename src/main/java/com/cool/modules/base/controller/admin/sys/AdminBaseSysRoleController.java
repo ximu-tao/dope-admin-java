@@ -5,6 +5,7 @@ import static com.cool.modules.base.entity.sys.table.BaseSysRoleEntityTableDef.B
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.modules.base.entity.sys.BaseSysRoleEntity;
 import com.cool.modules.base.service.sys.BaseSysRoleService;
@@ -17,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @Tag(name = "系统角色", description = "系统角色")
 @CoolRestController(api = { "add", "delete", "update", "page", "list", "info" })
-public class AdminBaseSysRoleController extends BaseController<BaseSysRoleService, BaseSysRoleEntity> {
+public class AdminBaseSysRoleController extends AdminController<BaseSysRoleService, BaseSysRoleEntity> {
 
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {

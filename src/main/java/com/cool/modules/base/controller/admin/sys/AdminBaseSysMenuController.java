@@ -2,6 +2,7 @@ package com.cool.modules.base.controller.admin.sys;
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.R;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "系统菜单", description = "系统菜单")
 @CoolRestController(api = {"add", "delete", "update", "page", "list", "info"})
 public class AdminBaseSysMenuController extends
-    BaseController<BaseSysMenuService, BaseSysMenuEntity> {
+        AdminController<BaseSysMenuService, BaseSysMenuEntity> {
 
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {

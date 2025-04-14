@@ -2,6 +2,7 @@ package com.cool.modules.recycle.controller.admin;
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.core.request.R;
 import com.cool.modules.recycle.entity.RecycleDataEntity;
@@ -24,7 +25,7 @@ import java.util.Map;
 @Tag(name = "数据回收站", description = "数据回收站")
 @CoolRestController(api = { "add", "delete", "update", "page", "list", "info" })
 @RequiredArgsConstructor
-public class AdminRecycleDataController extends BaseController<RecycleDataService, RecycleDataEntity> {
+public class AdminRecycleDataController extends AdminController<RecycleDataService, RecycleDataEntity> {
     final private RecycleDataService recycleDataService;
 
     @Override

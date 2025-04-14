@@ -2,6 +2,7 @@ package com.cool.modules.base.controller.admin.sys;
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.core.request.R;
 import com.cool.modules.base.entity.sys.BaseSysUserEntity;
@@ -18,7 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @Tag(name = "系统用户", description = "系统用户")
 @CoolRestController(api = { "add", "delete", "update", "page", "info" })
-public class AdminBaseSysUserController extends BaseController<BaseSysUserService, BaseSysUserEntity> {
+public class AdminBaseSysUserController extends AdminController<BaseSysUserService, BaseSysUserEntity> {
 
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {

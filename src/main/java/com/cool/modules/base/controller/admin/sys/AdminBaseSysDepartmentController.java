@@ -2,6 +2,7 @@ package com.cool.modules.base.controller.admin.sys;
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.core.request.R;
 import com.cool.modules.base.entity.sys.BaseSysDepartmentEntity;
@@ -20,7 +21,7 @@ import java.util.List;
 @Tag(name = "系统部门", description = "系统部门")
 @CoolRestController(api = { "add", "delete", "update", "list" })
 public class AdminBaseSysDepartmentController
-        extends BaseController<BaseSysDepartmentService, BaseSysDepartmentEntity> {
+        extends AdminController<BaseSysDepartmentService, BaseSysDepartmentEntity> {
 
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {

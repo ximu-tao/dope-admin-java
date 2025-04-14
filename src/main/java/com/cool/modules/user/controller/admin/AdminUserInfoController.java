@@ -4,6 +4,7 @@ import static com.cool.modules.user.entity.table.UserInfoEntityTableDef.USER_INF
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.modules.user.entity.UserInfoEntity;
 import com.cool.modules.user.service.UserInfoService;
@@ -12,7 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Tag(name = "用户信息", description = "用户信息")
 @CoolRestController(api = {"add", "delete", "update", "page", "list", "info"})
-public class AdminUserInfoController extends BaseController<UserInfoService, UserInfoEntity> {
+public class AdminUserInfoController extends AdminController<UserInfoService, UserInfoEntity> {
 
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {

@@ -4,6 +4,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AppController;
 import com.cool.core.base.BaseController;
 import com.cool.core.request.R;
 import com.cool.modules.dict.entity.DictInfoEntity;
@@ -20,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @Tag(name = "字典信息", description = "字典信息")
 @CoolRestController(api = {})
-public class AppDictInfoController extends BaseController<DictInfoService, DictInfoEntity> {
+public class AppDictInfoController extends AppController<DictInfoService, DictInfoEntity> {
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {
 

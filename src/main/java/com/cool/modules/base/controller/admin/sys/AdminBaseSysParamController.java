@@ -4,6 +4,7 @@ import static com.cool.modules.base.entity.sys.table.BaseSysParamEntityTableDef.
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.modules.base.entity.sys.BaseSysParamEntity;
 import com.cool.modules.base.service.sys.BaseSysParamService;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Tag(name = "系统参数配置", description = "系统参数配置")
 @CoolRestController(api = { "add", "delete", "update", "page", "info" })
-public class AdminBaseSysParamController extends BaseController<BaseSysParamService, BaseSysParamEntity> {
+public class AdminBaseSysParamController extends AdminController<BaseSysParamService, BaseSysParamEntity> {
 
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {

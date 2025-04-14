@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
 import com.cool.core.annotation.TokenIgnore;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.core.request.R;
 import com.cool.modules.dict.entity.DictInfoEntity;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @Tag(name = "字典信息", description = "字典信息")
 @CoolRestController(api = {"add", "delete", "update", "page", "list", "info"})
-public class AdminDictInfoController extends BaseController<DictInfoService, DictInfoEntity> {
+public class AdminDictInfoController extends AdminController<DictInfoService, DictInfoEntity> {
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {
         setListOption(createOp().fieldEq(DictInfoEntityTableDef.DICT_INFO_ENTITY.TYPE_ID)

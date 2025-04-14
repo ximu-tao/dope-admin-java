@@ -97,121 +97,6 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
 
     protected abstract void init(HttpServletRequest request, JSONObject requestParams);
 
-    /**
-     * 新增
-     * <p>
-     * // * @param t 实体对象
-     */
-    @Operation(summary = "新增", description = "新增信息，对应后端的实体类")
-    @PostMapping("/add")
-    protected R add(@RequestAttribute() JSONObject requestParams) {
-        String body = requestParams.getStr("body");
-        if (JSONUtil.isTypeJSONArray(body)) {
-            JSONArray array = JSONUtil.parseArray(body);
-            return R.ok(Dict.create()
-                .set("ids", service.addBatch(requestParams, array.toList(currentEntityClass()))));
-        } else {
-            return R.ok(Dict.create().set("id",
-                service.add(requestParams, requestParams.toBean(currentEntityClass()))));
-        }
-    }
-
-    /**
-     * 删除
-     *
-     * @param params 请求参数 ids 数组 或者按","隔开
-     */
-    @Operation(summary = "删除", description = "支持批量删除 请求参数 ids 数组 或者按\",\"隔开")
-    @PostMapping("/delete")
-    protected R delete(HttpServletRequest request, @RequestBody Map<String, Object> params,
-        @RequestAttribute() JSONObject requestParams) {
-        service.delete(requestParams, Convert.toLongArray(getIds(params)));
-        return R.ok();
-    }
-
-    /**
-     * 修改
-     *
-     * @param t 修改对象
-     */
-    @Operation(summary = "修改", description = "根据ID修改")
-    @PostMapping("/update")
-    protected R update(@RequestBody T t, @RequestAttribute() JSONObject requestParams) {
-        Long id = t.getId();
-        JSONObject info = JSONUtil.parseObj(JSONUtil.toJsonStr(service.getById(id)));
-        requestParams.forEach(info::set);
-        info.set("updateTime", new Date());
-        service.update(requestParams, JSONUtil.toBean(info, currentEntityClass()));
-        return R.ok();
-    }
-
-    /**
-     * 信息
-     *
-     * @param id ID
-     */
-    @Operation(summary = "信息", description = "根据ID查询单个信息")
-    @GetMapping("/info")
-    protected R<T> info(@RequestAttribute() JSONObject requestParams,
-        @RequestParam() Long id) {
-        return R.ok((T) service.info(requestParams, id));
-    }
-
-    /**
-     * 列表查询
-     *
-     * @param requestParams 请求参数
-     */
-    @Operation(summary = "查询", description = "查询多个信息")
-    @PostMapping("/list")
-    protected R<List<T>> list(@RequestAttribute() JSONObject requestParams,
-        @RequestAttribute(COOL_LIST_OP) CrudOption<T> option) {
-        QueryModeEnum queryModeEnum = option.getQueryModeEnum();
-        List list = (List) switch (queryModeEnum) {
-            case ENTITY_WITH_RELATIONS -> service.listWithRelations(requestParams, option.getQueryWrapper(currentEntityClass()));
-            case CUSTOM -> transformList(service.list(requestParams, option.getQueryWrapper(currentEntityClass()), option.getAsType()), option.getAsType());
-            default -> service.list(requestParams, option.getQueryWrapper(currentEntityClass()));
-        };
-        invokerTransform(option, list);
-        return R.ok(list);
-    }
-
-    /**
-     * 分页查询
-     *
-     * @param requestParams 请求参数
-     */
-    @Operation(summary = "分页", description = "分页查询多个信息")
-    @PostMapping("/page")
-    protected R<PageResult<T>> page(@RequestAttribute() JSONObject requestParams,
-        @RequestAttribute(COOL_PAGE_OP) CrudOption<T> option) {
-        Integer page = requestParams.getInt("page", 1);
-        Integer size = requestParams.getInt("size", 20);
-        QueryModeEnum queryModeEnum = option.getQueryModeEnum();
-        Object obj = switch (queryModeEnum) {
-            case ENTITY_WITH_RELATIONS -> service.pageWithRelations(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()));
-            case CUSTOM -> transformPage(service.page(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()), option.getAsType()), option.getAsType());
-            default -> service.page(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()));
-        };
-        Page pageResult = (Page) obj;
-        invokerTransform(option, pageResult.getRecords());
-        return R.ok(pageResult(pageResult));
-    }
-
-    /**
-     * 转换参数，组装数据
-     */
-    private void invokerTransform(CrudOption<T> option, Object obj) {
-        if (ObjUtil.isNotEmpty(option.getTransform())) {
-            if (obj instanceof List) {
-                ((List)obj).forEach(o -> {
-                    option.getTransform().apply(o);
-                });
-            } else {
-                option.getTransform().apply(obj);
-            }
-        }
-    }
 
     /**
      * 分页结果
@@ -235,14 +120,7 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
         throw new IllegalStateException("Unable to determine entity class type");
     }
 
-    protected List<Long> getIds(Map<String, Object> params) {
-        Object ids = params.get("ids");
-        CoolPreconditions.checkEmpty(ids, "ids 参数错误");
-        if (!(ids instanceof ArrayList)) {
-            ids = ids.toString().split(",");
-        }
-        return Convert.toList(Long.class, ids);
-    }
+
 
     /**
      * 适用于自定义返回值为 map，map 的key为数据库字段，转驼峰命名

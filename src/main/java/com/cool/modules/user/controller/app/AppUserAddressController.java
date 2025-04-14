@@ -4,6 +4,7 @@ import static com.cool.modules.user.entity.table.UserAddressEntityTableDef.USER_
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AppController;
 import com.cool.core.base.BaseController;
 import com.cool.core.request.R;
 import com.cool.core.util.CoolSecurityUtil;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Tag(name = "用户模块-收货地址", description = "用户模块-收货地址")
 @CoolRestController(api = {"add", "delete", "update", "page", "list", "info"})
-public class AppUserAddressController extends BaseController<UserAddressService, UserAddressEntity> {
+public class AppUserAddressController extends AppController<UserAddressService, UserAddressEntity> {
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {
         setPageOption(

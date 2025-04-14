@@ -6,6 +6,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
 import com.cool.core.annotation.IgnoreRecycleData;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.core.plugin.service.CoolPluginService;
 import com.cool.core.request.R;
@@ -28,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "插件信息", description = "插件信息")
 @CoolRestController(api = {"add", "delete", "update", "page", "list", "info"})
 @RequiredArgsConstructor
-public class AdminPluginInfoController extends BaseController<PluginInfoService, PluginInfoEntity> {
+public class AdminPluginInfoController extends AdminController<PluginInfoService, PluginInfoEntity> {
 
     final private CoolPluginService coolPluginService;
 

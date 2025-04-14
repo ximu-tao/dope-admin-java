@@ -2,6 +2,7 @@ package com.cool.modules.dict.controller.admin;
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.modules.dict.entity.DictTypeEntity;
 import com.cool.modules.dict.service.DictTypeService;
@@ -15,7 +16,7 @@ import static com.cool.modules.dict.entity.table.DictTypeEntityTableDef.DICT_TYP
  */
 @Tag(name = "字典类型", description = "字典类型")
 @CoolRestController(api = {"add", "delete", "update", "page", "list", "info"})
-public class AdminDictTypeController extends BaseController<DictTypeService, DictTypeEntity> {
+public class AdminDictTypeController extends AdminController<DictTypeService, DictTypeEntity> {
 
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {

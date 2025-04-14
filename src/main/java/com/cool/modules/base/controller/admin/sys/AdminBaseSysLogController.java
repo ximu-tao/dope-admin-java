@@ -2,6 +2,7 @@ package com.cool.modules.base.controller.admin.sys;
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.core.request.R;
 import com.cool.modules.base.entity.sys.BaseSysLogEntity;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 @RequiredArgsConstructor
 @Tag(name = "系统日志", description = "系统日志")
 @CoolRestController(api = {"page"})
-public class AdminBaseSysLogController extends BaseController<BaseSysLogService, BaseSysLogEntity> {
+public class AdminBaseSysLogController extends AdminController<BaseSysLogService, BaseSysLogEntity> {
 
 	private final BaseSysConfService baseSysConfService;
 

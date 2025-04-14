@@ -4,6 +4,7 @@ import static com.cool.modules.task.entity.table.TaskInfoEntityTableDef.TASK_INF
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
+import com.cool.core.base.AdminController;
 import com.cool.core.base.BaseController;
 import com.cool.core.request.R;
 import com.cool.modules.task.entity.TaskInfoEntity;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
  */
 @Tag(name = "任务管理", description = "统一管理任务")
 @CoolRestController(api = { "add", "delete", "update", "info", "page" })
-public class AdminTaskInfoController extends BaseController<TaskInfoService, TaskInfoEntity> {
+public class AdminTaskInfoController extends AdminController<TaskInfoService, TaskInfoEntity> {
 
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {
