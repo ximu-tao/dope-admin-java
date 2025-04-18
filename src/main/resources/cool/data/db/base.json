@@ -131,6 +131,19 @@
       "status": 0,
       "plugin_json": "",
       "config": "{\"appId\": \"\", \"secretId\": \"\", \"signName\": \"\", \"template\": \"\", \"secretKey\": \"\"}"
+    },
+    {
+      "name": "微信支付",
+      "description": "提供微信支付的相关功能，支付、下单、退款、生成订单号等",
+      "key": "pay-wx",
+      "hook": "",
+      "readme": "略",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "COOL官方",
+      "status": 0,
+      "plugin_json": "",
+      "config": "{\"key\": \"\", \"appid\": \"\", \"mchid\": \"\", \"notify_url\": \"\", \"privateKeyPath\": \"\", \"privateCertPath\": \"\"}"
     }
   ]
 }
