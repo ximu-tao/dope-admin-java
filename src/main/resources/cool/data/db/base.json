@@ -144,6 +144,19 @@
       "status": 0,
       "plugin_json": "",
       "config": "{\"key\": \"\", \"appid\": \"\", \"mchid\": \"\", \"notify_url\": \"\", \"privateKeyPath\": \"\", \"privateCertPath\": \"\"}"
+    },
+    {
+      "name": "通用微信SDK",
+      "description": "通用微信SDK，开发公众号小程序等",
+      "key": "wx",
+      "hook": "",
+      "readme": "略",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "COOL官方",
+      "status": 0,
+      "plugin_json": "",
+      "config": "{\"MiniApp\": {\"appid\": \"\", \"secret\": \"\"}, \"OfficialAccount\": {\"appId\": \"公众号的 app key\", \"token\": \"公众号的 token\", \"aesKey\": \"EncodingAESKey\", \"secret\": \"公众号的 app secret\", \"useStableAccessToken\": true}}"
     }
   ]
 }
