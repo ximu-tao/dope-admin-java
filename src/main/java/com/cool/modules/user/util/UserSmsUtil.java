@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import com.cool.plugin.TxSmsService;
 /**
  * UserSmsUtil - 用户短信工具类
  * 该类用于发送短信验证码。
@@ -34,6 +35,8 @@ public class UserSmsUtil {
 
     private final CoolCache coolCache;
 
+    private final TxSmsService txSmsService;
+    
     /**
      * 发送短信验证码
      *
@@ -76,9 +79,9 @@ public class UserSmsUtil {
         Map<String, Object> params = new HashMap<>();
         params.put("code", code);
         // 插件key sms-tx、sms-ali，哪个实例存在就调用哪个
-        if (coolPluginService.getInstanceWithoutCheck("sms-tx") != null) {
+        if ( txSmsService.isEnable() ) {
             // 调用腾讯短信插件
-            CoolPluginInvokers.invoke("sms-tx", "send", phones, params);
+            txSmsService.send(phones, params);
         } else if (coolPluginService.getInstanceWithoutCheck("sms-ali") != null) {
             // 调用阿里短信插件
             CoolPluginInvokers.invoke("sms-ali", "send", phones, params);

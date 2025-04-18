@@ -117,5 +117,20 @@
       "start_date": null,
       "end_date": null
     }
+  ],
+  "plugin_info": [
+    {
+      "name": "腾讯云短信",
+      "description": "调用腾讯云短信功能，发送短信",
+      "key": "sms-tx",
+      "hook": "",
+      "readme": "略",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "COOL官方",
+      "status": 0,
+      "plugin_json": "",
+      "config": "{\"appId\": \"\", \"secretId\": \"\", \"signName\": \"\", \"template\": \"\", \"secretKey\": \"\"}"
+    }
   ]
 }
