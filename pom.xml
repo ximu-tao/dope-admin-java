@@ -30,6 +30,15 @@
 
     <dependencies>
         
+        
+        <!--   支付宝相关 start -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.40.112.ALL</version>
+        </dependency>
+        <!--   支付宝相关 end -->
+        
         <dependency>
             <groupId>com.tencentcloudapi</groupId>
             <artifactId>tencentcloud-sdk-java-sms</artifactId>
