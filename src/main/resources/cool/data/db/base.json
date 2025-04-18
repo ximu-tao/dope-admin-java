@@ -124,5 +124,59 @@
       "start_date": null,
       "end_date": null
     }
+  ],
+  "plugin_info": [
+    {
+      "name": "腾讯云短信",
+      "description": "调用腾讯云短信功能，发送短信",
+      "key": "sms-tx",
+      "hook": "",
+      "readme": "略",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "COOL官方",
+      "status": 0,
+      "plugin_json": "",
+      "config": "{\"appId\": \"\", \"secretId\": \"\", \"signName\": \"\", \"template\": \"\", \"secretKey\": \"\"}"
+    },
+    {
+      "name": "微信支付",
+      "description": "提供微信支付的相关功能，支付、下单、退款、生成订单号等",
+      "key": "pay-wx",
+      "hook": "",
+      "readme": "略",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "COOL官方",
+      "status": 0,
+      "plugin_json": "",
+      "config": "{\"key\": \"\", \"appid\": \"\", \"mchid\": \"\", \"notify_url\": \"\", \"privateKeyPath\": \"\", \"privateCertPath\": \"\"}"
+    },
+    {
+      "name": "通用微信SDK",
+      "description": "通用微信SDK，开发公众号小程序等",
+      "key": "wx",
+      "hook": "",
+      "readme": "略",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "COOL官方",
+      "status": 0,
+      "plugin_json": "",
+      "config": "{\"MiniApp\": {\"appid\": \"\", \"secret\": \"\"}, \"OfficialAccount\": {\"appId\": \"公众号的 app key\", \"token\": \"公众号的 token\", \"aesKey\": \"EncodingAESKey\", \"secret\": \"公众号的 app secret\", \"useStableAccessToken\": true}}"
+    },
+    {
+      "name": "支付宝支付",
+      "description": "支付宝SDK功能",
+      "key": "pay-ali",
+      "hook": "",
+      "readme": "支付宝SDK",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "XimuTao",
+      "status": 0,
+      "plugin_json": "",
+      "config": "{\"log\": \"\", \"pid\": \"\", \"mode\": \"normal\", \"app_id\": \"\", \"scanpay\": \"\", \"signtype\": \"cert\", \"notify_url\": \"/\", \"return_url\": \"/\", \"server_url\": \"https://openapi.alipay.com/gateway.do\", \"private_key\": \"\", \"ali_public_key\": \"\", \"alipay_root_cert\": \"\", \"app_cert_public_key\": \"\"}"
+    }
   ]
 }
