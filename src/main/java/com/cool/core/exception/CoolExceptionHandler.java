@@ -7,8 +7,12 @@ import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 异常处理器
@@ -67,5 +71,21 @@ public class CoolExceptionHandler {
     public R handleException(WxErrorException e) {
         log.error(e.getMessage(), e);
         return R.error(e.getMessage());
+    }
+    
+        
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public R<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error -> 
+            errors.put(error.getField(), error.getDefaultMessage()));
+
+        String defaultMessage = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+
+        R<Map<String, String>> r = new R<>();
+        r.setCode(2000);
+        r.setMessage(defaultMessage);
+        r.setData(errors);
+        return r;
     }
 }
