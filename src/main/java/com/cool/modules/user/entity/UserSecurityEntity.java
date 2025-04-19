@@ -1,5 +1,6 @@
 package com.cool.modules.user.entity;
 
+import com.cool.core.base.BaseEntity;
 import com.cool.core.base.UserEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Table;
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
 
 @Data
 @Table(value = "user_security" , comment = "用户重要数据")
-public class UserSecurityEntity implements UserEntity {
+public class UserSecurityEntity extends BaseEntity<UserSecurityEntity> implements UserEntity {
     
     @Column(comment = "用户ID")
     @Schema( description = "用户ID（无需提交）")

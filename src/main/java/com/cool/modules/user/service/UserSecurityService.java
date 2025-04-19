@@ -7,4 +7,5 @@ import com.cool.modules.user.entity.UserSecurityEntity;
  * 用户重要数据
  */
 public interface UserSecurityService extends BaseService<UserSecurityEntity> {
+    UserSecurityEntity getByUserId(Long userId);
 }
