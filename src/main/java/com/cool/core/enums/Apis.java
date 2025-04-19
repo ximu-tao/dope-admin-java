@@ -7,7 +7,9 @@ public class Apis {
     public static final String PAGE = "page";
     public static final String LIST = "list";
     public static final String INFO = "info";
+    public static final String MY_LIST = "myList";
+    public static final String MY_INFO = "myInfo";
     
     
-    public static final String[] ALL_API = new String[]{ ADD, DELETE, UPDATE, PAGE, LIST, INFO };
+    public static final String[] ALL_API = new String[]{ ADD, DELETE, UPDATE, PAGE, LIST, INFO , MY_LIST, MY_INFO};
 }

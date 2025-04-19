@@ -2,7 +2,7 @@ package com.cool.modules.[(${module})].controller.[(${type})][(${subModule}?'.'+
 
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
-import com.cool.core.base.[${upperType}}]Controller;
+import com.cool.core.base.[(${upperType})]Controller;
 import com.cool.core.enums.Apis;
 import com.cool.modules.[(${module})].entity[(${subModule}?'.'+${subModule}:'')].[(${entity})]Entity;
 import com.cool.modules.[(${module})].service[(${subModule}?'.'+${subModule}:'')].[(${entity})]Service;
@@ -13,8 +13,8 @@ import jakarta.servlet.http.HttpServletRequest;
  * [(${name})]
  */
 @Tag(name = "[(${name})]", description = "[(${name})]")
-@CoolRestController(api = {Apis.ADD, Apis.DELETE, Apis.UPDATE, Apis.PAGE, Apis.LIST, Apis.INFO})
-public class [(${upperType})][(${entity})]Controller extends [${upperType}}]Controller<[(${entity})]Service, [(${entity})]Entity> {
+@CoolRestController(api = {Apis.ADD, Apis.DELETE, Apis.UPDATE, Apis.PAGE, Apis.LIST, Apis.INFO, Apis.MY_LIST, Apis.MY_INFO})
+public class [(${upperType})][(${entity})]Controller extends [(${upperType})]Controller<[(${entity})]Service, [(${entity})]Entity> {
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {
 
