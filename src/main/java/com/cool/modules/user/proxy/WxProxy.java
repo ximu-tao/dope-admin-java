@@ -43,7 +43,7 @@ public class WxProxy {
 
         PluginInfoEntity byKey = pluginInfoService.getByKey("wx");
         CoolPreconditions.checkEmpty( byKey , "插件参数未设置", new Object[0]);
-        Map<String, Object> config = byKey.getConfig();
+        Map<String, Object> config = (Map<String, Object>) byKey.getConfig();
 
         JSONObject jsonObject = JSONUtil.parseObj(config);
         JSONObject miniAppConfig = (JSONObject)jsonObject.get("MiniApp", JSONObject.class);
