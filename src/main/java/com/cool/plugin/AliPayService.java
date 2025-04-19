@@ -3,10 +3,13 @@ package com.cool.plugin;
 import cn.hutool.core.lang.Assert;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
+import com.alipay.api.AlipayConstants;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.cool.core.exception.CoolPreconditions;
 import com.cool.modules.plugin.entity.PluginInfoEntity;
 import com.cool.modules.plugin.service.PluginInfoService;
 import lombok.Getter;
@@ -24,12 +27,14 @@ public class AliPayService  {
     
     private Boolean enable = false;
     
+    private AlipayConfig alipayConfig = new AlipayConfig();
+    
     AliPayService(PluginInfoService pluginInfoService) throws AlipayApiException {
         try {
             
             PluginInfoEntity byKey = pluginInfoService.getByKey("pay-ali");
             Map<String, Object> config = (Map<String, Object>) byKey.getConfig();
-            AlipayConfig alipayConfig = new AlipayConfig();
+            
             //设置网关地址
             alipayConfig.setServerUrl((String) config.get("server_url"));
             //设置应用APPID
@@ -59,6 +64,38 @@ public class AliPayService  {
     
     public Boolean isEnable() {
         return enable;
+    }
+    
+
+    public String createOrderByApp(String totalAmount, String outTradeNo, String notifyUrl, String body) throws AlipayApiException {
+        
+        // 构造请求参数以调用接口
+        AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
+        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+        
+        // 设置商户订单号
+        model.setOutTradeNo( outTradeNo );
+        
+        // 设置订单总金额
+        model.setTotalAmount( totalAmount );
+        
+        // 设置订单标题
+        model.setSubject( body );
+        
+        request.setBizModel(model);
+        
+        request.setNotifyUrl(notifyUrl);
+
+        AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
+        
+        CoolPreconditions.check( !response.isSuccess() , "支付宝调用失败" );
+        
+        return response.getBody();
+    }
+
+    public Boolean verifyNotify( Map<String, String> params  ) throws AlipayApiException {
+        boolean b = AlipaySignature.rsaCertCheckV2(params, this.alipayConfig.getAlipayPublicCertPath(), AlipayConstants.CHARSET_UTF8, AlipayConstants.SIGN_TYPE_RSA2);
+        return b;
     }
 
 }

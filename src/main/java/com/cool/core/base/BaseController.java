@@ -49,6 +49,9 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
     protected S service;
     protected Class<T> entityClass;
 
+    @Getter
+    private HttpServletRequest request;
+    
     protected final String COOL_PAGE_OP = "COOL_PAGE_OP";
     protected final String COOL_LIST_OP = "COOL_LIST_OP";
     protected final String COOL_INFO_OP = "COOL_INFO_OP";
@@ -61,6 +64,9 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
     @ModelAttribute
     protected void preHandle(HttpServletRequest request,
         @RequestAttribute JSONObject requestParams) {
+        
+        this.request = request;
+        
         String requestPath = ((ServletRequestAttributes) Objects.requireNonNull(
             RequestContextHolder.getRequestAttributes())).getRequest().getRequestURI();
         if (!requestPath.endsWith("/page") && !requestPath.endsWith("/list")
@@ -149,4 +155,11 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
         page.setRecords(transformList(page.getRecords(), asType));
         return page;
     }
+    
+    
+    public String getDoamin() {
+        String s = "https://" + this.request.getServerName();
+        return s;
+    }
+    
 }
