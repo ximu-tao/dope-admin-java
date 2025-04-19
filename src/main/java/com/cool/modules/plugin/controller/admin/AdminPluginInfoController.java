@@ -3,7 +3,9 @@ package com.cool.modules.plugin.controller.admin;
 import static com.cool.modules.plugin.entity.table.PluginInfoEntityTableDef.PLUGIN_INFO_ENTITY;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.cool.core.annotation.CoolRestController;
 import com.cool.core.annotation.IgnoreRecycleData;
 import com.cool.core.base.AdminController;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -46,6 +49,11 @@ public class AdminPluginInfoController extends AdminController<PluginInfoService
     @PostMapping("/update")
     protected R update(@RequestBody PluginInfoEntity t,
         @RequestAttribute() JSONObject requestParams) {
+        if (ObjUtil.isNotEmpty(t.getConfig())) {
+            t.setConfig(JSONUtil.parseObj(t.getConfig()));
+        } else {
+            t.setConfig(new HashMap<>());
+        }
         coolPluginService.updatePlugin(t);
         return R.ok();
     }
