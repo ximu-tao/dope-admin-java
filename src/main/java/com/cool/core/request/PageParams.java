@@ -19,6 +19,9 @@ public class PageParams<T> {
     @Schema(description = "分页大小", defaultValue = "10")
     protected Integer size;
     
+    @Schema(description = "模糊查询" )
+    protected String keyWord;
+    
     
     @NotNull( message = "params 必须存在，至少提供一个空对象 {} ")
     protected T params;

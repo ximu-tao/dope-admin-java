@@ -1,7 +1,9 @@
 package com.cool.core.base;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import cn.hutool.json.JSONObject;
+import com.cool.core.annotation.FuzzyQueryField;
 import com.cool.core.annotation.ListSelectField;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.PageParams;
@@ -37,6 +39,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     protected Class<T> entityClass;
 
     protected QueryColumn[] selectField;
+    
+    protected QueryColumn[] keyWordField;
 
     public Class<T> currentEntityClass() {
         if (entityClass != null) {
@@ -85,6 +89,31 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
                 });
         this.selectField = selectFieldList.toArray(new QueryColumn[0]);
         return selectField;
+    }
+    
+    /**
+     * 获取支持模糊查询的字段
+     * @return
+     */
+    protected QueryColumn[] getKeyWordField(){
+        if (keyWordField != null) {
+            return keyWordField;
+        }
+        List<QueryColumn> keyWordFieldList = new ArrayList<QueryColumn>();
+
+        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+
+        Arrays.stream(this.getAllDeclaredFields(entityClass))
+                .filter(field -> {
+                    FuzzyQueryField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, FuzzyQueryField.class);
+                    return fieldInfo != null;
+                })
+                .forEach(field -> {
+                    String name = field.getName();
+                    keyWordFieldList.add(tableInfo.getQueryColumnByProperty(name));
+                });
+        this.keyWordField = keyWordFieldList.toArray(new QueryColumn[0]);
+        return keyWordField;
     }
 
 
@@ -238,6 +267,15 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
                 .orderBy(pageParams.getOrderBy(), pageParams.getOrder().toUpperCase(Locale.ENGLISH).equals("ASC"))
                 .select(this.getListSelectField());
 
+        String keyWord = pageParams.getKeyWord().trim();
+        if (!StrUtil.isBlankIfStr(keyWord)) {
+            queryWrapper.and(queryWrapper1 -> {
+                for (QueryColumn field : this.getKeyWordField()) {
+                    queryWrapper1.or(field.like(keyWord));
+                }
+            });
+        }
+        
         try {
             T params = pageParams.getParams();
             TableInfo tableInfo = TableInfoFactory.ofEntityClass(params.getClass());
