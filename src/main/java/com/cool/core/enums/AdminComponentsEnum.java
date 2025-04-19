@@ -102,4 +102,9 @@ public class AdminComponentsEnum {
      * 下拉框 - 适用于当选项过多时，使用下拉菜单展示并选择内容，如：分类、标签等
      */
     public static final String SELECT = "select";
+    
+    /**
+     * 远程下拉，建议使用 @EspRemoteSelectField 注解定义
+     */
+    public static final String REMOTE_SELECT = "remote-select";
 }

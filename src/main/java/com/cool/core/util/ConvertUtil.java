@@ -198,6 +198,37 @@ public class ConvertUtil {
         }
         return "";
     }
+    
+    public static String extractPath(String prefix, String className, String suffix) {
+        Pattern pattern = Pattern.compile("([A-Za-z0-9]+)"+suffix+"$");
+        Matcher matcher = pattern.matcher(className);
+
+        if (matcher.find()) {
+            String extracted = matcher.group(1);
+
+            // 将前缀拆分为单词数组
+            String[] prefixWords = splitCamelCase(prefix);
+            String[] classWords = splitCamelCase(extracted);
+
+            // 从前缀和类名中逐个匹配并去除匹配的部分
+            int i = 0;
+            for (int j = 0; i < prefixWords.length; j++) {
+                if (j >= classWords.length) {
+                    break;
+                }
+                for (String prefixWord : prefixWords) {
+                    if (prefixWord.equalsIgnoreCase(classWords[i])) {
+                        i++;
+                        break;
+                    }
+                }
+            }
+            // 从当前位置开始，拼接剩余部分
+            return String.join("/", java.util.Arrays.copyOfRange(classWords, i, classWords.length)).toLowerCase();
+        }
+        return "";
+    }
+    
 
     // 拆分驼峰命名的字符串为单词数组
     private static String[] splitCamelCase(String input) {

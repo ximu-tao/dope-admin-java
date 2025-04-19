@@ -11,7 +11,10 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.cool.core.annotation.EpsField;
+import com.cool.core.annotation.EspRemoteSelectField;
 import com.cool.core.config.CustomOpenApiResource;
+import com.cool.core.enums.AdminComponentsEnum;
+import com.cool.core.util.ConvertUtil;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import java.lang.annotation.Annotation;
@@ -351,6 +354,20 @@ public class CoolEps {
             dict.set("propertyName", field.getName());
             dict.set("type", matchType(field.getType().getName()));
             dict.set("nullable", !columnInfo.notNull());
+            
+            
+            EspRemoteSelectField remoteSelectField = AnnotatedElementUtils.findMergedAnnotation(field, EspRemoteSelectField.class);
+            if (remoteSelectField != null) {
+                dict.set("component", AdminComponentsEnum.REMOTE_SELECT );
+
+                Class<?> clazz = remoteSelectField.clazz();
+
+                String classPath = ConvertUtil.extractPath("", clazz.getSimpleName() , "Entity" );
+                dict.set("namespace",  "admin/" + classPath );
+                dict.set("multiple", remoteSelectField.multiple() );
+                dict.set("field", remoteSelectField.titleField() );
+            }
+            
             dictList.add(dict);
         }
         return dictList;

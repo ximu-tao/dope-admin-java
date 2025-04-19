@@ -1,5 +1,6 @@
 package com.cool.modules.user.entity;
 
+import com.cool.core.annotation.EspRemoteSelectField;
 import com.cool.core.base.BaseEntity;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
@@ -17,6 +18,7 @@ public class UserAddressEntity extends BaseEntity<UserAddressEntity> {
 
     @Index
     @ColumnDefine(comment = "用户ID", notNull = true)
+    @EspRemoteSelectField( titleField = "nickName", clazz = UserInfoEntity.class)
     private Long userId;
 
     @ColumnDefine(comment = "联系人", notNull = true)
