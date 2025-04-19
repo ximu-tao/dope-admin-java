@@ -1,9 +1,11 @@
 package com.cool.modules.user.entity;
 
 import com.cool.core.base.BaseEntity;
+import com.mybatisflex.annotation.RelationOneToOne;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import com.tangzc.mybatisflex.autotable.annotation.UniIndex;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,4 +39,9 @@ public class UserInfoEntity extends BaseEntity<UserInfoEntity> {
 
     @ColumnDefine(comment = "密码")
     private String password;
+    
+    @RelationOneToOne(selfField = "id", targetField = "user_id" )
+    @Schema( description = "用户重要数据")
+    private UserSecurityEntity securityData;
+    
 }
