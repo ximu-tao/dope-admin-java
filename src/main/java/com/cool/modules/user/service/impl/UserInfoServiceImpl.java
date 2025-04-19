@@ -2,6 +2,7 @@ package com.cool.modules.user.service.impl;
 
 import cn.hutool.crypto.digest.MD5;
 import com.cool.core.base.BaseServiceImpl;
+import com.cool.core.util.RedisUtils;
 import com.cool.modules.user.entity.UserInfoEntity;
 import com.cool.modules.user.mapper.UserInfoMapper;
 import com.cool.modules.user.service.UserInfoService;
@@ -39,6 +40,9 @@ public class UserInfoServiceImpl extends BaseServiceImpl<UserInfoMapper, UserInf
         info.setStatus(2);
         info.setNickName("已注销-00" + userId);
         info.updateById();
+
+        RedisUtils.publish("user-logoff" , userId );
+        
     }
 
     @Override
