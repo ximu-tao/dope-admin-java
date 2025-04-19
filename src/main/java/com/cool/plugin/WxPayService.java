@@ -27,7 +27,7 @@ public class WxPayService extends WxPayServiceImpl {
             
             PluginInfoEntity byKey = pluginInfoService.getByKey("pay-wx");
             
-            Map<String, Object> pluginIConfig = byKey.getConfig();
+            Map<String, Object> pluginIConfig = (Map<String, Object>) byKey.getConfig();
             WxPayConfig config = new WxPayConfig();
             config.setAppId( pluginIConfig.get("appid").toString() );
             config.setMchId( pluginIConfig.get("mchid").toString()  );

@@ -28,7 +28,7 @@ public class AliPayService  {
         try {
             
             PluginInfoEntity byKey = pluginInfoService.getByKey("pay-ali");
-            Map<String, Object> config = byKey.getConfig();
+            Map<String, Object> config = (Map<String, Object>) byKey.getConfig();
             AlipayConfig alipayConfig = new AlipayConfig();
             //设置网关地址
             alipayConfig.setServerUrl((String) config.get("server_url"));

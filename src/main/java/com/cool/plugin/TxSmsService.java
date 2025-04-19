@@ -42,7 +42,7 @@ public class TxSmsService {
             this.pluginInfoService = pluginInfoService;
 
             PluginInfoEntity byKey = pluginInfoService.getByKey("sms-tx");
-            Map<String, Object> config = byKey.getConfig();
+            Map<String, Object> config = (Map<String, Object>) byKey.getConfig();
 
             this.appId = (String) config.get("appId");
             this.secretId = (String) config.get("secretId");
