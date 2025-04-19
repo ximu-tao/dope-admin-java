@@ -60,7 +60,7 @@ public class CoolPluginService {
             log.info("没有可初始化的插件");
             return;
         }
-        list.forEach(this::initInstall);
+//        list.forEach(this::initInstall);
     }
 
     /**
