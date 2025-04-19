@@ -79,8 +79,11 @@ public abstract class AdminController <S extends BaseService<T>, T extends BaseE
     @Operation(summary = "信息", description = "根据ID查询单个信息")
     @GetMapping("/info")
     protected R<T> info(@RequestAttribute() JSONObject requestParams,
-        @RequestParam() Long id) {
-        return R.ok((T) service.info(requestParams, id));
+        @RequestParam() Long id,
+        @RequestAttribute(COOL_INFO_OP) CrudOption<T> option) {
+        T info = (T) service.info(requestParams, id);
+        invokerTransform(option, info);
+        return R.ok(info);
     }
 
     /**
@@ -91,7 +94,7 @@ public abstract class AdminController <S extends BaseService<T>, T extends BaseE
     @Operation(summary = "查询", description = "查询多个信息")
     @PostMapping("/list")
     protected R<List<T>> list(@RequestAttribute() JSONObject requestParams,
-                              @RequestAttribute(COOL_LIST_OP) CrudOption<T> option) {
+        @RequestAttribute(COOL_LIST_OP) CrudOption<T> option) {
         QueryModeEnum queryModeEnum = option.getQueryModeEnum();
         List list = (List) switch (queryModeEnum) {
             case ENTITY_WITH_RELATIONS -> service.listWithRelations(requestParams, option.getQueryWrapper(currentEntityClass()));
