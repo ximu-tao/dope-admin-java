@@ -3,6 +3,7 @@ package com.cool.core.base;
 import cn.hutool.json.JSONObject;
 import com.cool.core.request.PageParams;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
 import java.util.List;
@@ -13,6 +14,10 @@ import java.util.List;
  * @param <T> 实体
  */
 public interface BaseService<T> extends IService<T> {
+    QueryColumn[] getListSelectField();
+
+    QueryColumn[] getKeyWordField();
+
     /**
      * 新增
      *

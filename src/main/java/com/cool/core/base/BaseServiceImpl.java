@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static org.apache.commons.lang3.reflect.FieldUtils.getFieldsWithAnnotation;
-
 /**
  * 基础service实现类
  *
@@ -66,7 +64,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
 
 
-    protected QueryColumn[] getListSelectField() {
+    @Override
+    public QueryColumn[] getListSelectField() {
         if (selectField != null) {
             return selectField;
         }
@@ -95,7 +94,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
      * 获取支持模糊查询的字段
      * @return
      */
-    protected QueryColumn[] getKeyWordField(){
+    @Override
+    public QueryColumn[] getKeyWordField(){
         if (keyWordField != null) {
             return keyWordField;
         }

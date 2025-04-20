@@ -111,7 +111,19 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
         this.pageOption.set(pageOption);
     }
 
-    protected abstract void init(HttpServletRequest request, JSONObject requestParams);
+    protected void init(HttpServletRequest request, JSONObject requestParams){
+        setPageOption(
+            createOp()
+                .keyWordLikeFields( service.getKeyWordField() )
+                .select( service.getListSelectField() )
+                );
+
+        setListOption(
+            createOp()
+                .keyWordLikeFields( service.getKeyWordField() )
+                .select( service.getListSelectField() )
+                );
+    }
 
 
     /**
