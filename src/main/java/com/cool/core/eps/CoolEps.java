@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -412,6 +413,9 @@ public class CoolEps {
         return dictList;
     }
 
+    
+    private String[] filterField = new String[]{ "id", "createTime" , "updateTime" };
+    
     private List<Dict> relationColumns(Field[] fields, List<Dict> dictList) {
         for (Field field : fields) {
             
@@ -454,11 +458,13 @@ public class CoolEps {
             if ( fieldsClass != null ) {
                 
                             
-                if ( !fieldsClass.isAssignableFrom( BaseEntity.class ) ) {
+                if ( !BaseEntity.class.isAssignableFrom( fieldsClass ) ) {
                     return dictList;
                 }
 
                 Field[] relationFields = getAllDeclaredFields( fieldsClass );
+                
+                relationFields =  Arrays.stream(relationFields).filter(fieldItem -> !ArrayUtils.contains( filterField , fieldItem.getName() )).toArray(Field[]::new);
 
                 List<Dict> columns = columns(relationFields, fieldsClass.getSimpleName(), field.getName()+ "___" );
 
