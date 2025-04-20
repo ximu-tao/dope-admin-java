@@ -54,7 +54,7 @@ public class CrudOption<T> {
         this.requestParams = requestParams;
         this.queryWrapper = QueryWrapper.create();
         this.evn = SpringUtil.getBean(Environment.class);
-        queryModeEnum = QueryModeEnum.ENTITY;
+        queryModeEnum = QueryModeEnum.ENTITY_WITH_RELATIONS;
     }
 
     public QueryWrapper getQueryWrapper(Class<T> entityClass) {

@@ -40,7 +40,7 @@ public class UserInfoEntity extends BaseEntity<UserInfoEntity> {
     @ColumnDefine(comment = "密码")
     private String password;
     
-    @RelationOneToOne(selfField = "id", targetField = "user_id" )
+    @RelationOneToOne(selfField = "id", targetField = "userId" )
     @Schema( description = "用户重要数据")
     private UserSecurityEntity securityData;
     
