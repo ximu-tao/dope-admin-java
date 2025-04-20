@@ -12,10 +12,11 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.cool.core.annotation.EpsField;
 import com.cool.core.annotation.EspRemoteSelectField;
+import com.cool.core.base.BaseEntity;
 import com.cool.core.config.CustomOpenApiResource;
 import com.cool.core.enums.AdminComponentsEnum;
 import com.cool.core.util.ConvertUtil;
-import com.mybatisflex.annotation.Table;
+import com.mybatisflex.annotation.*;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -290,18 +291,40 @@ public class CoolEps {
         Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation("", Table.class);
         classes.forEach(e -> {
             // 获得属性
-            Field[] fields = getAllDeclaredFields(e);
-            List<Dict> columns = columns(fields);
-            entityInfo.set(e.getSimpleName(), columns);
-
-
-            Table mergedAnnotation = AnnotatedElementUtils.findMergedAnnotation(e, Table.class);
-
-            menuInfo.set(e.getSimpleName(), mergedAnnotation.comment());
-
-                    
+            this.parseEntityField( e );
         });
+        
+        classes.forEach(e -> {
+            // 获得关联属性
+            this.parseEntityEelationField( e );
+        });
+        
     }
+
+    /**
+     * 解析 Entity 的普通字段
+     * @param e
+     */
+    private void parseEntityField(Class<?> e) {
+        Field[] fields = getAllDeclaredFields(e);
+        List<Dict> columns = columns(fields , e.getSimpleName() , "");
+        entityInfo.set(e.getSimpleName(), columns);
+        
+        Table mergedAnnotation = AnnotatedElementUtils.findMergedAnnotation(e, Table.class);
+
+        menuInfo.set(e.getSimpleName(), mergedAnnotation.comment());
+    }
+
+    /**
+     * 解析 Entity 的关联字段
+     * @param e
+     */
+    private void parseEntityEelationField(Class<?> e) {
+        Field[] fields = getAllDeclaredFields(e);
+        relationColumns( fields , (List<Dict>) entityInfo.get( e.getSimpleName() ) );
+
+    }
+    
 
     /**
      * 获取类及其所有父类中声明的字段
@@ -329,14 +352,25 @@ public class CoolEps {
         return allFields.toArray(new Field[0]);
     }
 
+    
+    Map<String,Map<String, Dict>> allEntityFields= new HashMap<>();
     /**
      * 获得所有的列
      *
      * @param fields 字段名
      * @return 所有的列
      */
-    private List<Dict> columns(Field[] fields) {
+    private List<Dict> columns(Field[] fields, String name , String prefix) {
         List<Dict> dictList = new ArrayList<>();
+
+
+        Map<String, Dict> fieldsInfo = allEntityFields.get(name);
+        if ( fieldsInfo == null ) {
+            fieldsInfo = new HashMap<>();
+        }
+        
+        
+        
         for (Field field : fields) {
             Dict dict = Dict.create();
             
@@ -351,7 +385,7 @@ public class CoolEps {
             }
             dict.set("comment", columnInfo.comment());
             dict.set("length", columnInfo.length());
-            dict.set("propertyName", field.getName());
+            dict.set("propertyName", prefix + field.getName());
             dict.set("type", matchType(field.getType().getName()));
             dict.set("nullable", !columnInfo.notNull());
             
@@ -369,9 +403,72 @@ public class CoolEps {
             }
             
             dictList.add(dict);
+
+//            fieldsInfo.put(field.getName(), dict);
         }
+        
+//        allEntityFields.put( name , fieldsInfo );
+        
         return dictList;
     }
+
+    private List<Dict> relationColumns(Field[] fields, List<Dict> dictList) {
+        for (Field field : fields) {
+            
+            Dict dict = Dict.create();
+            
+            String relationValueField = null;
+            String[] relationSelectColumns = null;
+
+            Class<?> fieldsClass = null;
+            RelationManyToMany relationManyToMany = AnnotatedElementUtils.findMergedAnnotation(field, RelationManyToMany.class);
+            if (relationManyToMany != null) {
+                relationValueField = relationManyToMany.valueField();
+                relationSelectColumns = relationManyToMany.selectColumns();
+
+                fieldsClass = field.getType();
+            }
+            RelationManyToOne relationManyToOne = AnnotatedElementUtils.findMergedAnnotation(field, RelationManyToOne.class);
+            if (relationManyToOne != null) {
+                relationValueField = relationManyToOne.valueField();
+                relationSelectColumns = relationManyToOne.selectColumns();
+                
+                fieldsClass = field.getType();
+            }
+            RelationOneToOne relationOneToOne = AnnotatedElementUtils.findMergedAnnotation(field, RelationOneToOne.class);
+            if (relationOneToOne != null) {
+                relationValueField = relationOneToOne.valueField();
+                relationSelectColumns = relationOneToOne.selectColumns();
+                
+                fieldsClass = field.getType();
+            }
+            RelationOneToMany relationOneToMany = AnnotatedElementUtils.findMergedAnnotation(field, RelationOneToMany.class);
+            if (relationOneToMany != null) {
+                relationValueField = relationOneToMany.valueField();
+                relationSelectColumns = relationOneToMany.selectColumns();
+                
+                fieldsClass = field.getType();
+            }
+
+
+            if ( fieldsClass != null ) {
+                
+                            
+                if ( !fieldsClass.isAssignableFrom( BaseEntity.class ) ) {
+                    return dictList;
+                }
+
+                Field[] relationFields = getAllDeclaredFields( fieldsClass );
+
+                List<Dict> columns = columns(relationFields, fieldsClass.getSimpleName(), field.getName()+ "___" );
+
+                dictList.addAll( columns );
+            }
+        }
+
+        return dictList;
+    }
+    
 
     /**
      * java类型转换成JavaScript对应的类型
