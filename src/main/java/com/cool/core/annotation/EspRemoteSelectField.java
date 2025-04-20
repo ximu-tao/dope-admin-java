@@ -13,7 +13,7 @@ public @interface EspRemoteSelectField {
      * 目标表 entity
      * @return
      */
-    Class<?> clazz() default String.class;
+    Class<?> clazz();
 
     /**
      * 选择时显示的字段
