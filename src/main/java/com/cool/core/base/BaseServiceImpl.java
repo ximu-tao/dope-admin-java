@@ -3,7 +3,7 @@ package com.cool.core.base;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import cn.hutool.json.JSONObject;
-import com.cool.core.annotation.FuzzyQueryField;
+import com.cool.core.annotation.QuickQueryField;
 import com.cool.core.annotation.ListSelectField;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.PageParams;
@@ -105,7 +105,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
         Arrays.stream(this.getAllDeclaredFields(entityClass))
                 .filter(field -> {
-                    FuzzyQueryField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, FuzzyQueryField.class);
+                    QuickQueryField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, QuickQueryField.class);
                     return fieldInfo != null;
                 })
                 .forEach(field -> {
