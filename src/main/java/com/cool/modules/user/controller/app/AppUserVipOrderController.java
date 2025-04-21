@@ -3,9 +3,13 @@ package com.cool.modules.user.controller.app;
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.CoolRestController;
 import com.cool.core.base.AppController;
+import com.cool.core.base.PayableController;
 import com.cool.core.enums.Apis;
 import com.cool.modules.user.entity.UserVipOrderEntity;
+import com.cool.modules.user.service.UserInfoService;
 import com.cool.modules.user.service.UserVipOrderService;
+import com.cool.plugin.AliPayService;
+import com.cool.plugin.WxPayService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -14,7 +18,11 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 @Tag(name = "会员订单", description = "会员订单")
 @CoolRestController(api = {Apis.ADD, Apis.DELETE, Apis.MY_LIST })
-public class AppUserVipOrderController extends AppController<UserVipOrderService, UserVipOrderEntity> {
+public class AppUserVipOrderController extends PayableController<UserVipOrderService, UserVipOrderEntity> {
+    protected AppUserVipOrderController(WxPayService wxPayService, AliPayService aliPayService, UserInfoService userInfoService) {
+        super(wxPayService, aliPayService, userInfoService);
+    }
+
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {
 

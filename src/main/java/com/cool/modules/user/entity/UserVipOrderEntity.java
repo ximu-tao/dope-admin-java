@@ -49,7 +49,7 @@ public class UserVipOrderEntity extends AppEntity<UserVipOrderEntity> implements
     @NotNull(message = "开通的会员ID")
     @Schema( description = "开通的会员ID" )
     @EspRemoteSelectField( clazz = UserVipInfoEntity.class )
-    private Long vipRuleId;
+    private Long vipId;
     
     @Column(comment = "客户端类型")
     @ColumnDefine(comment = "客户端类型 mp_wechat-微信小程序 app-手机端 h5-手机网页", notNull = true)

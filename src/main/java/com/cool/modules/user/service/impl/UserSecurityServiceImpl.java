@@ -7,6 +7,8 @@ import com.cool.modules.user.mapper.UserSecurityMapper;
 import com.cool.modules.user.service.UserSecurityService;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * 用户重要数据
  */
@@ -24,7 +26,7 @@ public class UserSecurityServiceImpl extends BaseServiceImpl<UserSecurityMapper,
             byId.save();
         }
 
-        if (byId.getUserId() != userId) {
+        if (!Objects.equals(byId.getUserId(), userId)) {
             CoolPreconditions.alwaysThrow("用户重要数据异常", byId);
         }
 
