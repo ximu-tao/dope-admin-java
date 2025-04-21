@@ -1,7 +1,7 @@
 package com.cool.modules.user.entity;
 
 import com.cool.core.base.AppEntity;
-import com.cool.core.base.UserEntity;
+import com.cool.core.base.BelongingUserEntity;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Table(value = "user_balance_log", comment = "用户余额变更记录")
 @Data
 @Schema( description = "用户余额变更记录")
-public class UserBalanceLogEntity extends AppEntity<UserBalanceLogEntity> implements UserEntity {
+public class UserBalanceLogEntity extends AppEntity<UserBalanceLogEntity> implements BelongingUserEntity {
     
     
     @ColumnDefine(comment = "变更前金额", notNull = true)

@@ -1,7 +1,7 @@
 package com.cool.modules.user.entity;
 
 import com.cool.core.base.AppEntity;
-import com.cool.core.base.UserEntity;
+import com.cool.core.base.BelongingUserEntity;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import com.tangzc.mybatisflex.autotable.annotation.UniIndex;
@@ -12,7 +12,7 @@ import org.dromara.autotable.annotation.Index;
 @Data
 @Table(value = "user_oauth", comment = "第三方绑定信息")
 @Schema( description = "第三方绑定信息")
-public class UserOauthEntity extends AppEntity<UserOauthEntity> implements UserEntity {
+public class UserOauthEntity extends AppEntity<UserOauthEntity> implements BelongingUserEntity {
     
     @ColumnDefine(comment = "厂商", notNull = true)
     private String provider;
