@@ -29,6 +29,7 @@ public class UserSecurityEntity extends BaseEntity<UserSecurityEntity> implement
     private Integer points;
     
         
+    @Column(onInsertValue = "now()" )
     @ColumnDefine( comment = "会员过期时间" )
     private Date vipTime;
     
