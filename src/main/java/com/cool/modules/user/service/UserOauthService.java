@@ -12,4 +12,10 @@ public interface UserOauthService extends BaseService<UserOauthEntity> {
      * 微信小程序登录
      */
     UserOauthEntity loginByMini(String code, String encryptedData, String iv);
+
+
+    /**
+     * 获取 OpenID
+     */
+    String getOpenid( Long userId , String provider, String platform);
 }

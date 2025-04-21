@@ -56,11 +56,24 @@ public class UserOauthServiceImpl extends BaseServiceImpl<UserOauthMapper, UserO
         CoolPreconditions.alwaysThrow("获得小程序用户信息");
         return null;
     }
-    
-    
-    
+
+    @Override
+    public String getOpenid(Long userId, String provider, String platform) {
+
+        UserOauthEntity one = this.getOne(
+                QueryWrapper.create()
+                        .eq(UserOauthEntity::getUserId, userId)
+                        .eq(UserOauthEntity::getProvider, provider)
+                        .eq(UserOauthEntity::getPlatform, platform)
+        );
+
+
+        return one != null ? one.getOpenid() : "";
+    }
+
+
     public UserOauthEntity getBySave( UserOauthEntity entity ){
-        System.out.println( entity );
+
         UserOauthEntity one = this.getOne(
                 QueryWrapper.create()
                         .eq(UserOauthEntity::getOpenid, entity.getOpenid())

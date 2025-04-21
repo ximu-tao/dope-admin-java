@@ -16,8 +16,6 @@ public class UserInfoEntityTableDef extends TableDef {
 
     public final QueryColumn STATUS = new QueryColumn(this, "status");
 
-    public final QueryColumn UNIONID = new QueryColumn(this, "unionid");
-
     public final QueryColumn NICK_NAME = new QueryColumn(this, "nick_name");
 
     public final QueryColumn PASSWORD = new QueryColumn(this, "password");
@@ -38,7 +36,7 @@ public class UserInfoEntityTableDef extends TableDef {
     /**
      * 默认字段，不包含逻辑删除或者 large 等字段。
      */
-    public final QueryColumn[] DEFAULT_COLUMNS = new QueryColumn[]{ID, PHONE, GENDER, STATUS, UNIONID, NICK_NAME, PASSWORD, AVATAR_URL, LOGIN_TYPE, CREATE_TIME, UPDATE_TIME};
+    public final QueryColumn[] DEFAULT_COLUMNS = new QueryColumn[]{ID, PHONE, GENDER, STATUS, NICK_NAME, PASSWORD, AVATAR_URL, LOGIN_TYPE, CREATE_TIME, UPDATE_TIME};
 
     public UserInfoEntityTableDef() {
         super("", "user_info");

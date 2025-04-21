@@ -38,6 +38,12 @@ public interface PayableEntity extends BelongingUserEntity{
      * @return
      */
     public String getTerminal();
+
+    /**
+     * 修改客户端类型
+     * @param terminal
+     */
+    public void setTerminal( String terminal );
     
     /**
      * 支付渠道
@@ -45,6 +51,11 @@ public interface PayableEntity extends BelongingUserEntity{
      */
     public String getPayWay();
 
+    /**
+     * 修改支付渠道
+     * @param payWay
+     */
+    void setPayWay( String payWay );
     /**
      * 支付总价
      * @return

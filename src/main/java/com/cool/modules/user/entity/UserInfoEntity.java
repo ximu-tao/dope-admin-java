@@ -14,9 +14,6 @@ import lombok.Setter;
 @Table(value = "user_info", comment = "用户信息")
 public class UserInfoEntity extends BaseEntity<UserInfoEntity> {
 
-    @UniIndex
-    @ColumnDefine(comment = "登录唯一ID")
-    private String unionid;
 
     @ColumnDefine(comment = "头像")
     private String avatarUrl;

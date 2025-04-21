@@ -12,6 +12,7 @@ import com.cool.core.request.R;
 import com.cool.core.util.ConvertUtil;
 import com.cool.core.util.CoolSecurityUtil;
 import com.cool.modules.user.service.UserInfoService;
+import com.cool.modules.user.service.UserOauthService;
 import com.cool.plugin.AliPayService;
 import com.cool.plugin.WxPayService;
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
@@ -48,12 +49,12 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
 
     private final AliPayService aliPayService;
 
-    private final UserInfoService userInfoService;
+    private final UserOauthService userOauthService;
 
-    protected PayableController(WxPayService wxPayService, AliPayService aliPayService, UserInfoService userInfoService) {
+    protected PayableController(WxPayService wxPayService, AliPayService aliPayService, UserOauthService userOauthService) {
         this.wxPayService = wxPayService;
         this.aliPayService = aliPayService;
-        this.userInfoService = userInfoService;
+        this.userOauthService = userOauthService;
     }
 
     @Operation(summary = "支付", description = "支付")
@@ -100,7 +101,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
                     yield R.error(500, "微信支付未启用");
                 }
 
-                String wxOpenId = userInfoService.getById(info.getUserId()).getUnionid();
+                String wxOpenId = userOauthService.getOpenid( info.getUserId() , PayWayEnum.WECHAT ,  PayTerminalEnum.MP_WECHAT );
                 notifyUrl.append("/wxNotify");
                 WxPayMpOrderResult orderByMini = wxPayService.createOrderByMini((int) (info.getTotal() * 100), info.getOutTradeNo(), WxPayConstants.TradeType.JSAPI, notifyUrl.toString(), info.getBody(), wxOpenId);
                 yield R.ok(orderByMini);
