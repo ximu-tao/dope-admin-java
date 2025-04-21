@@ -30,7 +30,7 @@ public class AppController <S extends BaseService<T>, T extends BaseEntity<T>> e
     protected R<Long> add(@Valid @RequestBody T requestParams) {
         Long userId = CoolSecurityUtil.getCurrentUserId();
         
-        if (requestParams instanceof AppEntity<?> appEntity){
+        if (requestParams instanceof BelongingUserEntity appEntity){
             appEntity.setUserId(userId);
         }
         
@@ -38,14 +38,14 @@ public class AppController <S extends BaseService<T>, T extends BaseEntity<T>> e
         return R.ok(add);
     }
 
-    @Operation(summary = "删除", description = "支持批量删除 请求参数 ids 数组 或者按\",\"隔开")
+    @Operation(summary = "删除", description = "默认仅支持ID删除，具体看子类实现")
     @PostMapping("/delete")
     protected R<Boolean> delete( @RequestBody T requestParams ) {
         Boolean delete = service.delete(requestParams);
         return R.ok(delete);
     }
     
-    @Operation(summary = "修改", description = "根据ID修改")
+    @Operation(summary = "修改", description = "修改")
     @PostMapping("/update")
     protected R<Boolean> update(@RequestBody T t) {
         Boolean modify = service.modify(t);
