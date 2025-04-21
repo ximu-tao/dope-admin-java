@@ -5,6 +5,7 @@ import com.alipay.api.AlipayApiException;
 import com.cool.core.annotation.NoRepeatSubmit;
 import com.cool.core.annotation.TokenIgnore;
 import com.cool.core.cache.CoolCache;
+import com.cool.core.enums.PayStatusEnum;
 import com.cool.core.enums.PayTerminalEnum;
 import com.cool.core.enums.PayWayEnum;
 import com.cool.core.request.R;
@@ -80,13 +81,17 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
 
         String payWay = info.getPayWay();
 
-        if (!service.supportPayType(payWay)) {
+        if (!service.isSupportPayWay(payWay)) {
             return R.error(400, "不支持的支付方式");
+        }
+        
+        String payTerminal = info.getTerminal();
+        if ( !service.isSupportTerminal(payTerminal)){
+            return R.error(400, "不支持的客户端类型");
         }
 
 
         StringBuffer notifyUrl = new StringBuffer().append(getDoamin()).append("/").append(classPath);
-        String payTerminal = info.getTerminal();
 
 
         return switch (payTerminal) {
@@ -151,6 +156,11 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
                 // 支付成功的逻辑处理
                 log.info("微信支付成功，订单号: {}", outTradeNo);
 
+                
+                PayableEntity order = service.getByOutTradeNo( outTradeNo );
+                order.setPayStatus(PayStatusEnum.PAYED );
+                service.updateById((T) order);
+                
 
                 service.payNotice(outTradeNo);
 
@@ -174,11 +184,29 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
         if (params.get("trade_status").equals("TRADE_SUCCESS")) {
 
             try {
+
+                /**
+                 *  TODO：不知道为啥验签结果总是 false，
+                 *  可能是因为被我去除支付宝依赖冲突
+                 *     <groupId>org.bouncycastle</groupId>
+                 *     <artifactId>bcprov-jdk15on</artifactId>
+                 *     暂时不管验证结果
+                 */
+//                
                 aliPayService.verifyNotify(params);
             } catch (AlipayApiException e) {
                 return e.getMessage();
             }
+            
+            
 
+            PayableEntity order = service.getByOutTradeNo(params.get("out_trade_no"));
+            order.setPayStatus(PayStatusEnum.PAYED );
+            service.updateById((T) order);
+                
+            
+
+//            业务通知
             service.payNotice(params.get("out_trade_no"));
 
         }

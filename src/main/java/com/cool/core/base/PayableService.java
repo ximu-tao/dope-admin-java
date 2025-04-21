@@ -10,8 +10,24 @@ public interface PayableService<T> extends BaseService<T> {
 
     /**
      * 检查是否支持支付方式
-     * @param payType
+     * @param payWay
      * @return
      */
-    Boolean supportPayType( String payType );
+    Boolean isSupportPayWay( String payWay );
+    
+    
+    /**
+     * 检查是否支持客服端类型
+     * @param terminal
+     * @return
+     */
+    Boolean isSupportTerminal( String terminal );
+
+
+    /**
+     * 根据订单号获取订单实例
+     * @param outTradeNo
+     * @return
+     */
+    PayableEntity getByOutTradeNo( String outTradeNo );
 }
