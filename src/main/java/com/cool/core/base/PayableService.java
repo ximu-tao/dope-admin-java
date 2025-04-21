@@ -1,6 +1,6 @@
 package com.cool.core.base;
 
-public interface PayableService<T> extends BaseService<T> {
+public interface PayableService<T extends PayableEntity> extends BaseService<T > {
 
     /**
      * 支付完成通知
@@ -29,5 +29,5 @@ public interface PayableService<T> extends BaseService<T> {
      * @param outTradeNo
      * @return
      */
-    PayableEntity getByOutTradeNo( String outTradeNo );
+    T getByOutTradeNo( String outTradeNo );
 }

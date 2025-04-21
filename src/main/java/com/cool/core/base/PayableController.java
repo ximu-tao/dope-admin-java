@@ -35,12 +35,12 @@ import java.util.Map;
 
 
 /**
- * APP端控制层基类（用户数据隔离）
+ * 通用支付控制器
  *
  * @param <S>
  * @param <T>
  */
-public abstract class PayableController<S extends PayableService<T>, T extends AppEntity<T>> extends AppController<S, T> {
+public abstract class PayableController<S extends PayableService<T>, T extends AppEntity<T> & PayableEntity > extends AppController<S, T> {
 
     private static final Logger log = LoggerFactory.getLogger(PayableController.class);
 
@@ -67,13 +67,13 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
 
         log.info("微信支付，订单号: {}", id);
 
-        PayableEntity info = (PayableEntity) service.info(id);
+        T info = service.getById(id);
 
         if (StringUtils.isBlank(info.getOutTradeNo())) {
             info.setOutTradeNo(wxPayService.createOrderNum("0001"));
         }
 
-        service.update((T) info);
+        service.update( info);
 
         if (ObjectUtil.isEmpty(info)) {
             return R.error(404, "找不到订单");
@@ -157,9 +157,9 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
                 log.info("微信支付成功，订单号: {}", outTradeNo);
 
                 
-                PayableEntity order = service.getByOutTradeNo( outTradeNo );
+                T order = service.getByOutTradeNo( outTradeNo );
                 order.setPayStatus(PayStatusEnum.PAYED );
-                service.updateById((T) order);
+                service.updateById( order );
                 
 
                 service.payNotice(outTradeNo);
@@ -200,9 +200,9 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
             
             
 
-            PayableEntity order = service.getByOutTradeNo(params.get("out_trade_no"));
+            T order = service.getByOutTradeNo(params.get("out_trade_no"));
             order.setPayStatus(PayStatusEnum.PAYED );
-            service.updateById((T) order);
+            service.updateById( order) ;
                 
             
 
