@@ -1,6 +1,6 @@
 package com.cool.core.base;
 
-public interface PayableEntity extends UserEntity{
+public interface PayableEntity extends BelongingUserEntity{
     
     /**
      * 设置支付状态
