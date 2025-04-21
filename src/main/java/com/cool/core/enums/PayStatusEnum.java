@@ -6,5 +6,5 @@ public class PayStatusEnum {
     public static final Integer PAYING = 1;
     
 //    已支付
-    public static final Integer PAYED = 1;
+    public static final Integer PAYED = 2;
 }

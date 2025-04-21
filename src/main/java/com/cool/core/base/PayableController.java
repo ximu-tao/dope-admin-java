@@ -8,6 +8,7 @@ import com.cool.core.cache.CoolCache;
 import com.cool.core.enums.PayStatusEnum;
 import com.cool.core.enums.PayTerminalEnum;
 import com.cool.core.enums.PayWayEnum;
+import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.R;
 import com.cool.core.util.ConvertUtil;
 import com.cool.core.util.CoolSecurityUtil;
@@ -21,7 +22,11 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,28 +62,59 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
         this.userOauthService = userOauthService;
     }
 
+
+
+    @Data
+    @Schema( description = "支付参数" )
+    public static class PayInfo{
+        
+        @Schema( description = "使用 add 接口创建的订单ID，必填")
+        @NotNull
+        private Long id; 
+        
+        @Schema( description = "客户端类型 可选值 app、pc、h5、mp_wechat（微信小程序）、oa_wechat（微信公众号）")
+        private String terminal;
+        
+        
+        @Schema( description = "支付渠道 可选值 alipay、wechat")
+        private String payWay;
+        
+    }
+
     @Operation(summary = "支付", description = "支付")
-    @GetMapping("/pay")
+    @PostMapping("/pay")
     @NoRepeatSubmit
-    protected R pay(Long id) throws WxPayException {
+    protected R pay( @Valid @RequestBody PayInfo pay ) throws WxPayException {
 
         String className = this.getClass().getSimpleName();
         String classPath = ConvertUtil.extractController2Path("app", className);
 
+        log.info("调用支付，ID: {}", pay.getId() );
 
-        log.info("微信支付，订单号: {}", id);
-
-        T info = service.getById(id);
+        T info = service.getById( pay.getId() );
+        
+        CoolPreconditions.checkEmpty(info , "找不到订单");
+        
+        if ( PayStatusEnum.PAYED.equals( info.getPayStatus() ) ){
+            return R.error("订单已支付");
+        }
+        
+        info.setPayStatus( PayStatusEnum.PAYING );
 
         if (StringUtils.isBlank(info.getOutTradeNo())) {
             info.setOutTradeNo(wxPayService.createOrderNum("0001"));
         }
+        
+        if ( !StringUtils.isBlank(pay.getTerminal()) ) {
+            info.setTerminal( pay.getTerminal() );
+        }
+        
+        if ( !StringUtils.isBlank(pay.getPayWay()) ) {
+            info.setPayWay( pay.getPayWay() );
+        }
 
         service.update( info);
 
-        if (ObjectUtil.isEmpty(info)) {
-            return R.error(404, "找不到订单");
-        }
 
         String payWay = info.getPayWay();
 
