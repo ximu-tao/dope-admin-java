@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @Table(value = "user_security" , comment = "用户重要数据")
@@ -26,6 +27,10 @@ public class UserSecurityEntity extends BaseEntity<UserSecurityEntity> implement
     @ColumnDefine(comment = "积分")
     @Column(onInsertValue = "0")
     private Integer points;
+    
+        
+    @ColumnDefine( comment = "会员过期时间" )
+    private Date vipTime;
     
     @Column(version = true , onInsertValue = "0")
     private Integer version;
