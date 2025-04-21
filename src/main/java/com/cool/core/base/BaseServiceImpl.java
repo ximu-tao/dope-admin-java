@@ -264,7 +264,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     public QueryWrapper listsBefore(PageParams<T> pageParams) {
         QueryWrapper queryWrapper = QueryWrapper.create()
-                .orderBy(pageParams.getOrderBy(), pageParams.getOrder().toUpperCase(Locale.ENGLISH).equals("ASC"))
+                .orderBy(pageParams.getOrder(), pageParams.getSort().toUpperCase(Locale.ENGLISH).equals("ASC"))
                 .select(this.getListSelectField());
 
         String keyWord = pageParams.getKeyWord().trim();

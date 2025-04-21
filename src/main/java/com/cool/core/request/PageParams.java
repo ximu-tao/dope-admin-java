@@ -25,12 +25,18 @@ public class PageParams<T> {
     
     @NotNull( message = "params 必须存在，至少提供一个空对象 {} ")
     protected T params;
-    
+
+    /**
+     * 排序字段
+     */
     @Schema(description = "排序字段" , defaultValue = "id")
-    protected String orderBy = "id";
-    
+    protected String order = "id";
+
+    /**
+     * 排序方式 DESC 或 ASC
+     */
     @Schema(description = "排序" , defaultValue = "desc")
-    protected String order = "desc";
+    protected String sort = "desc";
 
 
     public Integer getPage() {
@@ -61,13 +67,6 @@ public class PageParams<T> {
         return size;
     }
     
-    public String getOrderBy() {
-        if (StringUtils.isEmpty(orderBy)) {
-            return "id";
-        }else {
-            return orderBy;
-        }
-    }
     
     
     public Page<T> toPage(){
