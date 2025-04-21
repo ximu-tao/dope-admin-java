@@ -14,15 +14,17 @@ import com.cool.core.security.jwt.JwtTokenUtil;
 import com.cool.core.security.jwt.JwtUser;
 import com.cool.modules.base.service.sys.BaseSysLoginService;
 import com.cool.modules.user.entity.UserInfoEntity;
-import com.cool.modules.user.entity.UserWxEntity;
+import com.cool.modules.user.entity.UserOauthEntity;
 import com.cool.modules.user.proxy.WxProxy;
 import com.cool.modules.user.service.UserInfoService;
 import com.cool.modules.user.service.UserLoginService;
-import com.cool.modules.user.service.UserWxService;
+import com.cool.modules.user.service.UserOauthService;
 import com.cool.modules.user.util.UserSmsUtil;
 import com.cool.modules.user.util.UserSmsUtil.SendSceneEnum;
 import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,7 +45,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     private final BaseSysLoginService baseSysLoginService;
 
-    private final UserWxService userWxService;
+    private final UserOauthService userOauthService;
 
     private final WxProxy wxProxy;
     private final static List<GrantedAuthority> authority =
@@ -77,22 +79,26 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     public Object mini(String code, String encryptedData, String iv) {
-        UserWxEntity userWxEntity = userWxService.getMiniUserInfo(code, encryptedData, iv);
-        return wxLoginToken(userWxEntity);
+        UserOauthEntity userOauthEntity = userOauthService.loginByMini(code, encryptedData, iv);
+        return wxLoginToken( userOauthEntity );
     }
 
-    private Object wxLoginToken(UserWxEntity userWxEntity) {
-        String unionId = ObjUtil.isNotEmpty(userWxEntity.getUnionid()) ? userWxEntity.getUnionid()
-            : userWxEntity.getOpenid();
-        UserInfoEntity userInfoEntity = userInfoService.getOne(
-            QueryWrapper.create().eq(UserInfoEntity::getUnionid, unionId));
+    private Object wxLoginToken(UserOauthEntity userOauthEntityBywx ) {
+        Long userId = ObjUtil.isNotEmpty(userOauthEntityBywx.getUserId()) ? userOauthEntityBywx.getUserId()
+            : 0L;
+        UserInfoEntity userInfoEntity = userInfoService.getById(userId);
+        
         if (ObjUtil.isEmpty(userInfoEntity)) {
             userInfoEntity = new UserInfoEntity();
-            userInfoEntity.setNickName(ObjUtil.isNotEmpty(userWxEntity.getNickName()) ? userWxEntity.getNickName() : generateRandomNickname());
-            userInfoEntity.setGender(userWxEntity.getGender());
-            userInfoEntity.setAvatarUrl(userWxEntity.getAvatarUrl());
-            userInfoEntity.setUnionid(unionId);
+            Map<String, Object> extend = userOauthEntityBywx.getExtend();
+            userInfoEntity.setNickName( extend.getOrDefault( "nick_name" ,generateRandomNickname()  ).toString() );
+            userInfoEntity.setGender(  Integer.parseInt( extend.getOrDefault( "gender" , 0 ).toString() ) );
+            userInfoEntity.setAvatarUrl(  extend.getOrDefault( "avatar_url" ,null ).toString() );
+            
             userInfoEntity.save();
+            userOauthEntityBywx.setUserId( userInfoEntity.getId() );
+
+            userOauthEntityBywx.updateById();
         }
         return generateToken(userInfoEntity, null);
     }
