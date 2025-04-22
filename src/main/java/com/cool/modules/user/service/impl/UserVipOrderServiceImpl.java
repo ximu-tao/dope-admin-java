@@ -1,7 +1,7 @@
 package com.cool.modules.user.service.impl;
 
 import com.cool.core.enums.PayStatusEnum;
-import com.cool.core.pay.PayableServiceImpl;
+import com.cool.core.pay.PayableServiceAdapter;
 import com.cool.modules.user.entity.UserSecurityEntity;
 import com.cool.modules.user.entity.UserVipInfoEntity;
 import com.cool.modules.user.entity.UserVipOrderEntity;
@@ -18,7 +18,7 @@ import java.util.Date;
  * 会员订单
  */
 @Service
-public class UserVipOrderServiceImpl extends PayableServiceImpl<UserVipOrderMapper, UserVipOrderEntity> implements UserVipOrderService {
+public class UserVipOrderServiceImpl extends PayableServiceAdapter<UserVipOrderMapper, UserVipOrderEntity> implements UserVipOrderService {
 
 
     private final UserVipInfoService userVipInfoService;
