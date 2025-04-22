@@ -4,7 +4,7 @@
         "router": "/sys",
         "perms": null,
         "type": 0,
-        "icon": "icon-set",
+        "icon": "icon-system",
         "orderNum": 2,
         "viewPath": null,
         "keepAlive": true,
@@ -513,7 +513,7 @@
         "orderNum": 0,
         "viewPath": "modules/demo/views/home/index.vue",
         "keepAlive": true,
-        "isShow": false,
+        "isShow": true,
         "childMenus": []
     },
     {

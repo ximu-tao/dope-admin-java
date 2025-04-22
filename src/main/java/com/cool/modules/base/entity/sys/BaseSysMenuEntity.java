@@ -5,12 +5,14 @@ import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import java.util.List;
+
+import com.tangzc.mybatisflex.autotable.annotation.UniIndex;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.dromara.autotable.annotation.Index;
 
-@Getter
-@Setter
+@Data
 @Table(value = "base_sys_menu", comment = "系统菜单表")
 public class BaseSysMenuEntity extends BaseEntity<BaseSysMenuEntity> {
     @Index
@@ -33,6 +35,7 @@ public class BaseSysMenuEntity extends BaseEntity<BaseSysMenuEntity> {
     private Integer orderNum;
 
     @ColumnDefine(comment = "菜单地址")
+    @UniIndex
     private String router;
 
     @ColumnDefine(comment = "视图地址")
