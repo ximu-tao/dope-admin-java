@@ -1,6 +1,5 @@
 package com.cool.plugin;
 
-import cn.hutool.core.lang.Assert;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.AlipayConstants;
@@ -10,7 +9,7 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.cool.core.base.BasePaymentService;
-import com.cool.core.base.PayableEntity;
+import com.cool.core.pay.PayableEntity;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.modules.plugin.entity.PluginInfoEntity;
 import com.cool.modules.plugin.service.PluginInfoService;

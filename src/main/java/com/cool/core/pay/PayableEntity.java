@@ -1,8 +1,10 @@
-package com.cool.core.base;
+package com.cool.core.pay;
+
+import com.cool.core.base.BelongingUserEntity;
 
 import java.time.LocalDateTime;
 
-public interface PayableEntity extends BelongingUserEntity{
+public interface PayableEntity extends BelongingUserEntity {
     
     /**
      * 设置支付状态

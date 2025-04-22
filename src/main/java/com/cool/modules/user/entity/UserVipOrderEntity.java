@@ -2,11 +2,8 @@ package com.cool.modules.user.entity;
 
 import com.cool.core.annotation.EspRemoteSelectField;
 import com.cool.core.base.AppEntity;
-import com.cool.core.base.BaseEntity;
 import com.cool.core.base.BelongingUserEntity;
-import com.cool.core.base.PayableEntity;
-import com.cool.core.enums.PayTerminalEnum;
-import com.cool.core.enums.PayWayEnum;
+import com.cool.core.pay.PayableEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;

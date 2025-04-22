@@ -1,7 +1,7 @@
 package com.cool.plugin;
 
 import com.cool.core.base.BasePaymentService;
-import com.cool.core.base.PayableEntity;
+import com.cool.core.pay.PayableEntity;
 import com.cool.core.enums.PayTerminalEnum;
 import com.cool.core.enums.PayWayEnum;
 import com.cool.modules.plugin.entity.PluginInfoEntity;

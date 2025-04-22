@@ -1,4 +1,7 @@
-package com.cool.core.base;
+package com.cool.core.pay;
+
+import com.cool.core.base.BaseEntity;
+import com.cool.core.base.BaseService;
 
 public interface PayableService<T extends BaseEntity<T> & PayableEntity> extends BaseService<T> {
 

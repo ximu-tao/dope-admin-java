@@ -1,10 +1,11 @@
 package com.cool.core.base;
 
 import cn.hutool.core.util.RandomUtil;
+import com.cool.core.pay.PayableEntity;
 
 public interface BasePaymentService {
     
-    Object create( PayableEntity entity, Long payerId, String notifyUrl ) throws Exception;
+    Object create(PayableEntity entity, Long payerId, String notifyUrl ) throws Exception;
     
     
     /**
