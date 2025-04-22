@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
-public class AppController <S extends BaseService<T>, T extends BaseEntity<T>> extends BaseController<S,T> {
+public abstract class AppController <S extends BaseService<T>, T extends BaseEntity<T>> extends BaseController<S,T> {
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {
         
@@ -69,7 +69,7 @@ public class AppController <S extends BaseService<T>, T extends BaseEntity<T>> e
     protected R<PageResult<T>> myList( @Valid @RequestBody PageParams<T> pageParams ) {
         
         T requestParams = pageParams.getParams();
-        if (requestParams instanceof AppEntity<?> appEntity){
+        if (requestParams instanceof BelongingUserEntity appEntity){
             appEntity.setUserId(CoolSecurityUtil.getCurrentUserId());
         }
         
