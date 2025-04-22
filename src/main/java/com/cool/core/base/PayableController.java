@@ -73,6 +73,31 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         return R.ok(add);
     }
 
+    
+        
+    @Operation(summary = "关闭订单", description = "关闭订单，默认仅支持ID参数")
+    @PostMapping("/close")
+    protected R<Boolean> close( @RequestBody T entity){
+        T info = service.getById( entity.getId() );
+        CoolPreconditions.checkEmpty(info , "找不到订单");
+        
+        if ( PayStatusEnum.PAYED.equals( info.getPayStatus() ) ){
+            return R.error("订单已支付" );
+        }
+        
+        info.setPayStatus( PayStatusEnum.CANCEL );
+
+        boolean update = service.update(info);
+        if (update){
+            try {
+                service.close( info );
+            }catch (Exception e){}
+        }
+
+        return R.ok(update);
+    }
+    
+    
 
     @Data
     @Schema( description = "支付参数" )
@@ -108,6 +133,12 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         if ( PayStatusEnum.PAYED.equals( info.getPayStatus() ) ){
             return R.error("订单已支付");
         }
+        
+        
+        if ( PayStatusEnum.CANCEL.equals( info.getPayStatus() ) ){
+            return R.error("订单已关闭");
+        }
+
         
         info.setPayStatus( PayStatusEnum.PAYING );
 

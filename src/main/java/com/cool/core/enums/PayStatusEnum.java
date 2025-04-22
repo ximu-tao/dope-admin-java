@@ -7,4 +7,7 @@ public class PayStatusEnum {
     
 //    已支付
     public static final Integer PAYED = 2;
+    
+//    已取消
+    public static final Integer CANCEL = 3;
 }

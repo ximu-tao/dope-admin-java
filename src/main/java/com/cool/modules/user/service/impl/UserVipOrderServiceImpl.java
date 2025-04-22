@@ -78,6 +78,11 @@ public class UserVipOrderServiceImpl extends BaseServiceImpl<UserVipOrderMapper,
     }
 
     @Override
+    public void close(UserVipOrderEntity entity) {
+        this.delete(entity);
+    }
+
+    @Override
     public Boolean isSupportPayWay(String payWay) {
         switch (payWay) {
             case PayWayEnum.ALIPAY, PayWayEnum.WECHAT:

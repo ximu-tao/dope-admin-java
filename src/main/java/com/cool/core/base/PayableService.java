@@ -7,6 +7,9 @@ public interface PayableService<T extends BaseEntity<T> & PayableEntity> extends
      * @param outTradeNo 支付单号
      */
     void payNotice( String outTradeNo );
+    
+    
+    void close( T entity );
 
     /**
      * 检查是否支持支付方式
