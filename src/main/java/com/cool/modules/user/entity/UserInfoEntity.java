@@ -1,6 +1,7 @@
 package com.cool.modules.user.entity;
 
 import com.cool.core.base.BaseEntity;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.RelationOneToOne;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
@@ -41,4 +42,7 @@ public class UserInfoEntity extends BaseEntity<UserInfoEntity> {
     @Schema( description = "用户重要数据")
     private UserSecurityEntity securityData;
     
+    @ColumnDefine(comment = "拉黑用户")
+    @Column( onInsertValue = "false" )
+    private Boolean block;
 }

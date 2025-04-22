@@ -178,6 +178,9 @@ public class UserLoginServiceImpl implements UserLoginService {
         return generateToken(userInfoEntity, refreshToken);
     }
     private Dict generateToken(UserInfoEntity userInfoEntity, String refreshToken) {
+        
+        CoolPreconditions.check( userInfoEntity.getBlock() , 403, "您已被拉黑");
+        
         Dict tokenInfo = Dict.create()
             .set("userType", UserTypeEnum.APP.name())
             .set("userId", userInfoEntity.getId());
