@@ -12,6 +12,11 @@ public interface PayableService<T extends BaseEntity<T> & PayableEntity> extends
     void payNotice( String outTradeNo );
     
     
+    /**
+     * 取消订单
+     * 一般仅支持ID参数
+     * @param entity
+     */
     void close( T entity );
 
     /**
