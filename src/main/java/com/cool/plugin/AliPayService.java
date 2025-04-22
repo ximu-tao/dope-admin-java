@@ -9,6 +9,8 @@ import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.cool.core.base.BasePaymentService;
+import com.cool.core.base.PayableEntity;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.modules.plugin.entity.PluginInfoEntity;
 import com.cool.modules.plugin.service.PluginInfoService;
@@ -19,7 +21,7 @@ import java.util.Map;
 
 
 @Service
-public class AliPayService  {
+public class AliPayService implements BasePaymentService {
     
     
     @Getter
@@ -67,6 +69,7 @@ public class AliPayService  {
     }
     
 
+    @Deprecated
     public String createOrderByApp(String totalAmount, String outTradeNo, String notifyUrl, String body) throws AlipayApiException {
         
         // 构造请求参数以调用接口
@@ -96,6 +99,32 @@ public class AliPayService  {
     public Boolean verifyNotify( Map<String, String> params  ) throws AlipayApiException {
         boolean b = AlipaySignature.rsaCertCheckV2(params, this.alipayConfig.getAlipayPublicCertPath(), AlipayConstants.CHARSET_UTF8, AlipayConstants.SIGN_TYPE_RSA2);
         return b;
+    }
+    
+    @Override
+    public String create( PayableEntity entity, Long payerId, String notifyUrl ) throws AlipayApiException {
+                // 构造请求参数以调用接口
+        AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
+        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+        
+        // 设置商户订单号
+        model.setOutTradeNo( entity.getOutTradeNo() );
+        
+        // 设置订单总金额
+        model.setTotalAmount( entity.getTotal().toString() );
+        
+        // 设置订单标题
+        model.setSubject( entity.getBody() );
+        
+        request.setBizModel(model);
+        
+        request.setNotifyUrl(notifyUrl);
+
+        AlipayTradeAppPayResponse response = alipayClient.sdkExecute(request);
+        
+        CoolPreconditions.check( !response.isSuccess() , "支付宝调用失败" );
+        
+        return response.getBody();
     }
 
 }

@@ -147,9 +147,8 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
                     yield R.error(500, "微信支付未启用");
                 }
 
-                String wxOpenId = userOauthService.getOpenid( info.getUserId() , PayWayEnum.WECHAT ,  PayTerminalEnum.MP_WECHAT );
-                notifyUrl.append("/wxNotify");
-                WxPayMpOrderResult orderByMini = wxPayService.createOrderByMini((int) (info.getTotal() * 100), info.getOutTradeNo(), WxPayConstants.TradeType.JSAPI, notifyUrl.toString(), info.getBody(), wxOpenId);
+                WxPayMpOrderResult orderByMini = wxPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() );
+
                 yield R.ok(orderByMini);
             }
             case PayTerminalEnum.APP -> switch (payWay) {
@@ -160,7 +159,8 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
                     }
 
                     notifyUrl.append("/wxNotify");
-                    WxPayMpOrderResult orderByApp = wxPayService.createOrderByApp((int) (info.getTotal() * 100), info.getOutTradeNo(), notifyUrl.toString(), info.getBody());
+                    
+                    WxPayMpOrderResult orderByApp = wxPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() );
                     yield R.ok(orderByApp);
 
                 }
@@ -171,8 +171,8 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
                     }
                     notifyUrl.append("/aliNotify");
                     try {
-                        String orderByAliApp = aliPayService.createOrderByApp(info.getTotal().toString(), info.getOutTradeNo(), notifyUrl.toString(), info.getBody());
-                        System.out.println(orderByAliApp);
+                        
+                        String orderByAliApp = aliPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() );
 
                         yield R.ok(orderByAliApp);
                     } catch (AlipayApiException e) {

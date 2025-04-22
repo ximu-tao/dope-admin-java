@@ -1,8 +1,12 @@
 package com.cool.plugin;
 
-import cn.hutool.core.util.RandomUtil;
+import com.cool.core.base.BasePaymentService;
+import com.cool.core.base.PayableEntity;
+import com.cool.core.enums.PayTerminalEnum;
+import com.cool.core.enums.PayWayEnum;
 import com.cool.modules.plugin.entity.PluginInfoEntity;
 import com.cool.modules.plugin.service.PluginInfoService;
+import com.cool.modules.user.service.UserOauthService;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.config.WxPayConfig;
@@ -15,14 +19,17 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-public class WxPayService extends WxPayServiceImpl {
+public class WxPayService extends WxPayServiceImpl implements BasePaymentService {
 
     @Getter
     private Boolean enable = false;
     
     private WxPayService wxPayService;
     
-    public WxPayService(PluginInfoService pluginInfoService) {
+    private final UserOauthService userOauthService;
+    
+    public WxPayService(PluginInfoService pluginInfoService, UserOauthService userOauthService) {
+        this.userOauthService = userOauthService;
         try {
             
             PluginInfoEntity byKey = pluginInfoService.getByKey("pay-wx");
@@ -59,20 +66,9 @@ public class WxPayService extends WxPayServiceImpl {
     }
     
     
-    /**
-    * 生成订单号，基于时间戳+唯一字符串+随机数+可选的子ID
-    *
-    * @param subId 可选，如你的订单ID, 或者用户ID的一些组合
-    * @return 订单号
-    */
-    public String createOrderNum( String subId ) {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String randomString = RandomUtil.randomString(8);
-        int randomNumber = 666;
-        return timestamp + randomString + randomNumber + (subId != null ? subId : "");
-    }
     
     
+    @Deprecated
     public WxPayMpOrderResult createOrderByMini(Integer totalFee , String outTradeNo , String tradeType , String notifyUrl , String body, String openid) 
             throws WxPayException {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
@@ -89,6 +85,7 @@ public class WxPayService extends WxPayServiceImpl {
     }
     
     
+    @Deprecated
     public WxPayMpOrderResult createOrderByApp(Integer totalFee , String outTradeNo, String notifyUrl , String body ) 
             throws WxPayException {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
@@ -101,5 +98,30 @@ public class WxPayService extends WxPayServiceImpl {
         return this.createOrder( orderRequest );
         
         
+    }
+    
+    
+    
+
+
+
+    @Override
+    public WxPayMpOrderResult create(PayableEntity entity, Long payerId, String notifyUrl) throws WxPayException {
+        WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
+        orderRequest.setBody( entity.getBody() );
+        orderRequest.setOutTradeNo( entity.getOutTradeNo() );
+        orderRequest.setTotalFee( (int)(entity.getTotal()*100) );
+        
+        orderRequest.setSpbillCreateIp("127.0.0.1");
+        orderRequest.setNotifyUrl( notifyUrl );
+        
+        if (PayTerminalEnum.MP_WECHAT.equals( entity.getTerminal() )){
+            orderRequest.setOpenid( userOauthService.getOpenid( payerId , PayWayEnum.WECHAT ,  PayTerminalEnum.MP_WECHAT ) );
+            orderRequest.setTradeType( WxPayConstants.TradeType.JSAPI );
+        }else if ( PayTerminalEnum.APP.equals( entity.getTerminal() ) ){
+            orderRequest.setTradeType( WxPayConstants.TradeType.APP );
+        }
+        
+        return this.createOrder( orderRequest );
     }
 }
