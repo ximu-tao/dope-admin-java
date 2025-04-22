@@ -62,6 +62,15 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         this.userOauthService = userOauthService;
     }
 
+        
+    @Operation(summary = "创建订单", description = "创建订单后使用返回ID值调用同目录 pay 接口")
+    @PostMapping("/add")
+    public R<Long> add(@Valid @RequestBody T requestParams) {
+        Long userId = CoolSecurityUtil.getCurrentUserId();
+        requestParams.setUserId(userId);
+        Long add = service.create(requestParams);
+        return R.ok(add);
+    }
 
 
     @Data
