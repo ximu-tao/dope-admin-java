@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 
@@ -210,6 +211,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
                 
                 T order = service.getByOutTradeNo( outTradeNo );
                 order.setPayStatus(PayStatusEnum.PAYED );
+                order.setPayTime( LocalDateTime.now() );
                 service.updateById( order );
                 
 
@@ -253,6 +255,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
 
             T order = service.getByOutTradeNo(params.get("out_trade_no"));
             order.setPayStatus(PayStatusEnum.PAYED );
+            order.setPayTime( LocalDateTime.now() );
             service.updateById( order) ;
                 
             

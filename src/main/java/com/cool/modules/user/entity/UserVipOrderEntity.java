@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Schema( description = "会员开通订单")
 @Table(value = "user_vip_order", comment = "会员订单")
@@ -63,6 +65,9 @@ public class UserVipOrderEntity extends AppEntity<UserVipOrderEntity> implements
     @ColumnDefine(comment = "开通时长（天）" )
     @Schema(hidden = true)
     protected Integer day;
+    
+    @ColumnDefine(comment = "支付时间" )
+    protected LocalDateTime payTime;
 
     @Override
     public String getBody() {

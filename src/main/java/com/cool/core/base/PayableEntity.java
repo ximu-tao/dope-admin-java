@@ -1,5 +1,7 @@
 package com.cool.core.base;
 
+import java.time.LocalDateTime;
+
 public interface PayableEntity extends BelongingUserEntity{
     
     /**
@@ -62,4 +64,9 @@ public interface PayableEntity extends BelongingUserEntity{
      */
     public Double getTotal();
     
+    
+    /**
+     * 设置支付时间
+     */
+    public void setPayTime( LocalDateTime payTime );
 }
