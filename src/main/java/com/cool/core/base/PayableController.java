@@ -46,7 +46,7 @@ import java.util.Map;
  * @param <S>
  * @param <T>
  */
-public abstract class PayableController<S extends PayableService<T>, T extends AppEntity<T> & PayableEntity > extends AppController<S, T> {
+public abstract class PayableController<S extends PayableService<T>, T extends BaseEntity<T> & PayableEntity > extends AppController<S, T> {
 
     private static final Logger log = LoggerFactory.getLogger(PayableController.class);
 
@@ -133,6 +133,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
 
         return switch (payTerminal) {
             case PayTerminalEnum.MP_WECHAT -> {
+//                小程序端只支持微信支付
                 if (!wxPayService.isEnable()) {
                     yield R.error(500, "微信支付未启用");
                 }
@@ -144,6 +145,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
             }
             case PayTerminalEnum.APP -> switch (payWay) {
                 case PayWayEnum.WECHAT -> {
+//                    APP端微信支付
                     if (!wxPayService.isEnable()) {
                         yield R.error(500, "微信支付未启用");
                     }
@@ -154,6 +156,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
 
                 }
                 case PayWayEnum.ALIPAY -> {
+//                    APP端支付宝
                     if (!aliPayService.isEnable()) {
                         yield R.error(500, "支付宝支付未启用");
                     }
@@ -171,8 +174,10 @@ public abstract class PayableController<S extends PayableService<T>, T extends A
                 }
                 default -> R.error(400 , "参数错误或暂不支持的支付方式");
             };
-            //  TODO: H5端支付
-            case PayTerminalEnum.H5 -> R.error(400 , "参数错误或暂不支持的支付方式");
+            //  TODO: 多端支付
+            case PayTerminalEnum.H5 ->  R.error(400 , "暂不支持H5支付");
+            case PayTerminalEnum.WOA -> R.error(400 , "暂不支持公众号支付");
+            case PayTerminalEnum.PC ->  R.error(400 , "暂不支持网页支付");
             default -> R.error(400 , "参数错误或暂不支持的支付方式");
         };
 

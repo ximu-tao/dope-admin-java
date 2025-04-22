@@ -3,6 +3,7 @@ package com.cool.modules.user.entity;
 import com.cool.core.annotation.EspRemoteSelectField;
 import com.cool.core.base.AppEntity;
 import com.cool.core.base.BaseEntity;
+import com.cool.core.base.BelongingUserEntity;
 import com.cool.core.base.PayableEntity;
 import com.cool.core.enums.PayTerminalEnum;
 import com.cool.core.enums.PayWayEnum;
@@ -16,7 +17,7 @@ import lombok.Data;
 @Data
 @Schema( description = "会员开通订单")
 @Table(value = "user_vip_order", comment = "会员订单")
-public class UserVipOrderEntity extends AppEntity<UserVipOrderEntity> implements PayableEntity {
+public class UserVipOrderEntity extends AppEntity<UserVipOrderEntity> implements PayableEntity, BelongingUserEntity {
     
     @ColumnDefine(comment = "价格", notNull = true)
     @Schema(hidden = true)

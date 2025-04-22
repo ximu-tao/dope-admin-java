@@ -1,6 +1,6 @@
 package com.cool.core.base;
 
-public interface PayableService<T extends PayableEntity> extends BaseService<T > {
+public interface PayableService<T extends BaseEntity<T> & PayableEntity> extends BaseService<T> {
 
     /**
      * 支付完成通知
