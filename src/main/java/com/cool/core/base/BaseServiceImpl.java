@@ -268,8 +268,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
                 .orderBy(pageParams.getOrder(), pageParams.getSort().toUpperCase(Locale.ENGLISH).equals("ASC"))
                 .select(this.getListSelectField());
 
-        String keyWord = pageParams.getKeyWord().trim();
-        if (!StrUtil.isBlankIfStr(keyWord)) {
+        if (!StrUtil.isBlankIfStr(pageParams.getKeyWord())) {
+            String keyWord = pageParams.getKeyWord().trim();
             queryWrapper.and(queryWrapper1 -> {
                 for (QueryColumn field : this.getKeyWordField()) {
                     queryWrapper1.or(field.like(keyWord));
