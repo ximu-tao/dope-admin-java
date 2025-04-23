@@ -7,6 +7,7 @@ import com.cool.core.annotation.QuickQueryField;
 import com.cool.core.annotation.ListSelectField;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.PageParams;
+import com.cool.core.util.CoolSecurityUtil;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryColumn;
@@ -319,7 +320,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     @Override
     public T details(Long id) {
         this.detailsBefore(id);
-        T byId = this.getById(id);
+        T byId = this.mapper.selectOneWithRelationsById(id);
         this.detailsyAfter( byId );
         return byId;
     }
@@ -327,7 +328,15 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     @Override
     public T myDetails(Long id) {
         this.detailsBefore(id);
-        T byId = this.getById(id);
+        T byId = this.details(id);
+        
+        if (byId instanceof BelongingUserEntity appEntity){
+            
+            CoolPreconditions.check( !CoolSecurityUtil.getCurrentUserId().equals( appEntity.getUserId() ),
+                    "不是你的数据");
+
+        }
+        
         this.detailsyAfter( byId );
         return byId;
     }
