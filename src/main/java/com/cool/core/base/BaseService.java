@@ -170,6 +170,23 @@ public interface BaseService<T> extends IService<T> {
      */
     void modifyBefore(JSONObject requestParams, T t);
 
+
+    /**
+     * 管理端 删除之前
+     * @param requestParams
+     * @param type
+     * @param ids
+     */
+    void deleteBefore(JSONObject requestParams, ModifyEnum type, Long... ids);
+    
+    /**
+     * 管理端 删除之后
+     * @param requestParams
+     * @param type
+     * @param ids
+     */
+    void deleteAfter(JSONObject requestParams, ModifyEnum type, Long... ids);
+
     /**
      * 修改之前
      *

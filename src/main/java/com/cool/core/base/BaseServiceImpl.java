@@ -150,9 +150,12 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     @Override
     public boolean delete(JSONObject requestParams, Long... ids) {
         this.modifyBefore(requestParams, null, ModifyEnum.DELETE);
+        this.deleteBefore(requestParams, ModifyEnum.DELETE, ids );
+        
         boolean flag = this.delete(ids);
         if (flag) {
             this.modifyAfter(requestParams, null, ModifyEnum.DELETE);
+            this.deleteAfter(requestParams, ModifyEnum.DELETE , ids );
         }
         return flag;
     }
@@ -222,6 +225,16 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     @Override
     public void modifyAfter(JSONObject requestParams, T t, ModifyEnum type) {
         modifyAfter(requestParams, t);
+    }
+
+    @Override
+    public void deleteAfter(JSONObject requestParams, ModifyEnum type, Long... ids) {
+        
+    }
+
+    @Override
+    public void deleteBefore(JSONObject requestParams, ModifyEnum type, Long... ids) {
+        
     }
 
     @Override
