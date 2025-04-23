@@ -115,12 +115,14 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
         setPageOption(
             createOp()
                 .keyWordLikeFields( service.getKeyWordField() )
+                .fieldEq( service.getAllField() )
                 .select( service.getListSelectField() )
                 );
 
         setListOption(
             createOp()
                 .keyWordLikeFields( service.getKeyWordField() )
+                .fieldEq( service.getAllField() )
                 .select( service.getListSelectField() )
                 );
     }

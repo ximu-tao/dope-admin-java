@@ -15,6 +15,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.table.TableInfo;
 import com.mybatisflex.core.table.TableInfoFactory;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
@@ -41,6 +42,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     
     protected QueryColumn[] keyWordField;
 
+    protected QueryColumn[] allField;
+    
     public Class<T> currentEntityClass() {
         if (entityClass != null) {
             return this.entityClass;
@@ -64,6 +67,33 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         return fields.toArray(new Field[0]);
     }
 
+
+    @Override
+    public QueryColumn[] getAllField() {
+            if (allField != null) {
+            return allField;
+        }
+
+        List<QueryColumn> allFieldList = new ArrayList<QueryColumn>();
+
+        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+
+        Arrays.stream(this.getAllDeclaredFields(entityClass))
+                .filter(field -> {
+                    ColumnDefine fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, ColumnDefine.class);
+                    return fieldInfo!=null;
+                })
+                .forEach(field -> {
+                    String name = field.getName();
+                    allFieldList.add(tableInfo.getQueryColumnByProperty(name));
+                });
+        this.allField = allFieldList.toArray(new QueryColumn[0]);
+
+        System.out.println( allFieldList );
+        System.out.println( allField );
+        
+        return allField;
+    }
 
     @Override
     public QueryColumn[] getListSelectField() {

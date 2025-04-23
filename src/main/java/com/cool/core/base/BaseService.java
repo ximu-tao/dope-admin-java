@@ -17,6 +17,8 @@ public interface BaseService<T> extends IService<T> {
     QueryColumn[] getListSelectField();
 
     QueryColumn[] getKeyWordField();
+    
+    QueryColumn[] getAllField();
 
     /**
      * 新增
