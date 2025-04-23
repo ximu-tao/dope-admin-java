@@ -3,6 +3,7 @@ package com.cool.modules.base.entity.sys;
 import com.cool.core.base.BaseEntity;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import com.tangzc.mybatisflex.autotable.annotation.UniIndex;
 import lombok.Getter;
 import lombok.Setter;
 import org.dromara.autotable.annotation.Index;
@@ -11,7 +12,7 @@ import org.dromara.autotable.annotation.Index;
 @Setter
 @Table(value = "base_sys_param", comment = "系统参数配置")
 public class BaseSysParamEntity extends BaseEntity<BaseSysParamEntity> {
-    @Index
+    @UniIndex
     @ColumnDefine(comment = "键", notNull = true)
     private String keyName;
 
