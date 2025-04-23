@@ -51,7 +51,8 @@ public class AdminBaseSysMenuController extends
                 Object id = service.add(requestParams, bean);
                 return R.ok(Dict.create().set("id", id ) );
             } catch (DuplicateKeyException e) {
-                QueryWrapper queryWrapper = QueryWrapper.create(bean);
+                QueryWrapper queryWrapper = QueryWrapper.create()
+                        .eq( BaseSysMenuEntity::getRouter , bean.getRouter() );
                 List<BaseSysMenuEntity> list = this.service.list(queryWrapper);
                 BaseSysMenuEntity baseSysMenuEntity = list.get(0);
                 return R.ok(Dict.create().set("id", baseSysMenuEntity.getId() ) );
