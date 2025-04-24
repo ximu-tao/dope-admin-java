@@ -23,6 +23,7 @@ public abstract class BaseEntity<T extends Model<T>> extends Model<T> implements
 
     @Id(keyType = KeyType.Auto, comment = "ID")
     @EpsField( excludeEq = true )
+    @ColumnDefine(comment = "ID")
     protected Long id;
 
     @Column(onInsertValue = "now()")
