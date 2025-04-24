@@ -184,7 +184,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
             selectFieldList.add(tableInfo.getQueryColumnByProperty(name));
         });
 
-        return selectQueryColumn;
+        return selectQueryColumn = selectFieldList.toArray(new QueryColumn[0]) ;
 
     }
 
