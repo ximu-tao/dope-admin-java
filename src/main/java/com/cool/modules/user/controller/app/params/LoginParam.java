@@ -40,6 +40,10 @@ public class LoginParam {
     private String username;
     
     
+    @Schema(description = "密码登录时 手机号、用户名 都行")
+    private String account;
+    
+    
     @Schema(description = "密码,密码登录")
     private String password;
 }

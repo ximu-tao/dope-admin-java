@@ -168,11 +168,15 @@ public class AppUserLoginController {
      * 密码登录
      */
     @TokenIgnore
-    @Operation(summary = "密码登录")
+    @Operation(summary = "账号密码登录")
     @PostMapping("/password")
     public R password(
         @RequestBody LoginParam param) {
-        String phoneOrUsername = param.getUsername()!=null? param.getUsername(): param.getPhone();
+        
+        String phoneOrUsername = param.getAccount()!=null ? param.getAccount():
+                param.getUsername()!=null? param.getUsername(): 
+                        param.getPhone();
+        
         String password = param.getPassword();
 
         CoolPreconditions.checkEmpty( phoneOrUsername );
@@ -182,7 +186,7 @@ public class AppUserLoginController {
     
     
     @TokenIgnore
-    @Operation(summary = "密码注册")
+    @Operation(summary = "用户名、密码注册")
     @PostMapping("/register")
     public R register(
         @RequestBody LoginParam param) {
