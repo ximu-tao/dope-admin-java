@@ -203,7 +203,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         }
 
 
-        getAllField().stream()
+        return keyWordField = getAllField().stream()
                 .filter(field -> {
                     QuickQueryField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, QuickQueryField.class);
                     if (fieldInfo != null) {
@@ -214,9 +214,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
                         return epsFieldInfo.quickQuery();
                     }
                     return false;
-                });
-
-        return keyWordField;
+                }).toList();
     }
 
 
