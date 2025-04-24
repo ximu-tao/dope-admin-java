@@ -1,5 +1,6 @@
 package com.cool.core.base;
 
+import com.cool.core.annotation.EpsField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
@@ -21,14 +22,17 @@ import org.dromara.autotable.annotation.Ignore;
 public abstract class BaseEntity<T extends Model<T>> extends Model<T> implements Serializable {
 
     @Id(keyType = KeyType.Auto, comment = "ID")
+    @EpsField( excludeEq = true )
     protected Long id;
 
     @Column(onInsertValue = "now()")
     @ColumnDefine(comment = "创建时间")
+    @EpsField( excludeEq = true )
     protected Date createTime;
 
     @Column(onInsertValue = "now()", onUpdateValue = "now()")
     @ColumnDefine(comment = "更新时间")
+    @EpsField( excludeEq = true )
     protected Date updateTime;
 
     @Ignore

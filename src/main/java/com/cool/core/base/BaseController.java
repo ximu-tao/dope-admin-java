@@ -114,16 +114,16 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
     protected void init(HttpServletRequest request, JSONObject requestParams){
         setPageOption(
             createOp()
-                .keyWordLikeFields( service.getKeyWordField() )
-                .fieldEq( service.getAllField() )
-                .select( service.getListSelectField() )
+                .keyWordLikeFields( service.getKeyWordQueryColumn() )
+                .fieldEq( service.getAllQueryColumn() )
+                .select( service.getListSelectQueryColumn() )
                 );
 
         setListOption(
             createOp()
-                .keyWordLikeFields( service.getKeyWordField() )
-                .fieldEq( service.getAllField() )
-                .select( service.getListSelectField() )
+                .keyWordLikeFields( service.getKeyWordQueryColumn() )
+                .fieldEq( service.getAllQueryColumn() )
+                .select( service.getListSelectQueryColumn() )
                 );
     }
 

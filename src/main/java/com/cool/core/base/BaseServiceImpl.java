@@ -3,6 +3,7 @@ package com.cool.core.base;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import cn.hutool.json.JSONObject;
+import com.cool.core.annotation.EpsField;
 import com.cool.core.annotation.QuickQueryField;
 import com.cool.core.annotation.ListSelectField;
 import com.cool.core.exception.CoolPreconditions;
@@ -32,17 +33,11 @@ import java.util.Locale;
  * @param <T> 实体
  */
 public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> extends
-    ServiceImpl<M, T>
-    implements BaseService<T> {
+        ServiceImpl<M, T>
+        implements BaseService<T> {
 
 
     protected Class<T> entityClass;
-
-    protected QueryColumn[] selectField;
-    
-    protected QueryColumn[] keyWordField;
-
-    protected QueryColumn[] allField;
     
     public Class<T> currentEntityClass() {
         if (entityClass != null) {
@@ -68,85 +63,183 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
 
 
+    protected List<Field> allField;
+
     @Override
-    public QueryColumn[] getAllField() {
-            if (allField != null) {
+    public List<Field> getAllField() {
+
+        if (allField != null) {
             return allField;
         }
 
-        List<QueryColumn> allFieldList = new ArrayList<QueryColumn>();
-
-        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
-
-        Arrays.stream(this.getAllDeclaredFields(entityClass))
+        return allField = Arrays.stream(this.getAllDeclaredFields(entityClass))
                 .filter(field -> {
                     ColumnDefine fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, ColumnDefine.class);
-                    return fieldInfo!=null;
-                })
-                .forEach(field -> {
-                    String name = field.getName();
-                    allFieldList.add(tableInfo.getQueryColumnByProperty(name));
-                });
-        this.allField = allFieldList.toArray(new QueryColumn[0]);
+                    return fieldInfo != null;
+                }).toList();
 
-        System.out.println( allFieldList );
-        System.out.println( allField );
-        
-        return allField;
     }
 
+
+    protected QueryColumn[] allQueryColumn;
+
     @Override
-    public QueryColumn[] getListSelectField() {
+    public QueryColumn[] getAllQueryColumn() {
+        if (allQueryColumn != null) {
+            return allQueryColumn;
+        }
+
+        List<QueryColumn> allQueryColumnList = new ArrayList<QueryColumn>();
+
+        List<Field> allField1 = getAllField();
+        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+
+        allField1.forEach(field -> {
+            String name = field.getName();
+            allQueryColumnList.add(tableInfo.getQueryColumnByProperty(name));
+        });
+        return this.allQueryColumn = allQueryColumnList.toArray(new QueryColumn[0]);
+
+    }
+
+
+    private List<Field> eqField = null;
+
+    @Override
+    public List<Field> getEqField() {
+        if (eqField != null) {
+            return eqField;
+        }
+
+        List<Field> allField1 = getAllField();
+
+        return eqField = allField1.stream().filter(field -> {
+            EpsField epsFieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, EpsField.class);
+            if (epsFieldInfo != null) {
+                return !epsFieldInfo.excludeEq();
+            }
+            return true;
+        }).toList();
+    }
+
+    protected QueryColumn[] eqQueryColumn = null;
+
+    @Override
+    public QueryColumn[] getEqQueryColumn() {
+
+        if (eqQueryColumn != null) {
+            return eqQueryColumn;
+        }
+
+        List<QueryColumn> eqQueryColumnList = new ArrayList<QueryColumn>();
+
+        List<Field> allField1 = getEqField();
+        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+
+        allField1.forEach(field -> {
+            String name = field.getName();
+            eqQueryColumnList.add(tableInfo.getQueryColumnByProperty(name));
+        });
+        return this.eqQueryColumn = eqQueryColumnList.toArray(new QueryColumn[0]);
+    }
+
+    protected List<Field> selectField;
+
+    @Override
+    public List<Field> getListSelectField() {
         if (selectField != null) {
             return selectField;
+        }
+
+        return selectField = this.getAllField().stream()
+                .filter(field -> {
+                    ListSelectField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, ListSelectField.class);
+                    if (fieldInfo != null) {
+                        return !fieldInfo.hidden();
+                    }
+                    EpsField epsFieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, EpsField.class);
+                    if (epsFieldInfo != null) {
+                        return !epsFieldInfo.excludeListSelect();
+                    }
+                    return true;
+                }).toList();
+    }
+
+
+    protected QueryColumn[] selectQueryColumn;
+
+    @Override
+    public QueryColumn[] getListSelectQueryColumn() {
+
+        if (selectQueryColumn != null) {
+            return selectQueryColumn;
         }
 
         List<QueryColumn> selectFieldList = new ArrayList<QueryColumn>();
 
         TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
 
-        Arrays.stream(this.getAllDeclaredFields(entityClass))
-                .filter(field -> {
-                    ListSelectField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, ListSelectField.class);
-                    if ( fieldInfo == null ) {
-                        return true;
-                    }
-                    return !fieldInfo.hidden();
-                })
-                .forEach(field -> {
-                    String name = field.getName();
-                    selectFieldList.add(tableInfo.getQueryColumnByProperty(name));
-                });
-        this.selectField = selectFieldList.toArray(new QueryColumn[0]);
-        return selectField;
+        this.getListSelectField().forEach(field -> {
+            String name = field.getName();
+            selectFieldList.add(tableInfo.getQueryColumnByProperty(name));
+        });
+
+        return selectQueryColumn;
+
     }
-    
+
+
+    protected List<Field> keyWordField;
+
+
     /**
      * 获取支持模糊查询的字段
      * @return
      */
     @Override
-    public QueryColumn[] getKeyWordField(){
+    public List<Field> getKeyWordField() {
         if (keyWordField != null) {
             return keyWordField;
         }
+
+
+        getAllField().stream()
+                .filter(field -> {
+                    QuickQueryField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, QuickQueryField.class);
+                    if (fieldInfo != null) {
+                        return true;
+                    }
+                    EpsField epsFieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, EpsField.class);
+                    if (epsFieldInfo != null) {
+                        return epsFieldInfo.quickQuery();
+                    }
+                    return false;
+                });
+
+        return keyWordField;
+    }
+
+
+    protected QueryColumn[] keyWordQueryColumn;
+
+    @Override
+    public QueryColumn[] getKeyWordQueryColumn() {
+        if (keyWordQueryColumn != null) {
+            return keyWordQueryColumn;
+        }
+
         List<QueryColumn> keyWordFieldList = new ArrayList<QueryColumn>();
 
         TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
 
-        Arrays.stream(this.getAllDeclaredFields(entityClass))
-                .filter(field -> {
-                    QuickQueryField fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, QuickQueryField.class);
-                    return fieldInfo != null;
-                })
-                .forEach(field -> {
-                    String name = field.getName();
-                    keyWordFieldList.add(tableInfo.getQueryColumnByProperty(name));
-                });
-        this.keyWordField = keyWordFieldList.toArray(new QueryColumn[0]);
-        return keyWordField;
-    }
+        List<Field> keyWordField1 = getKeyWordField();
+        keyWordField1.forEach(field -> {
+            String name = field.getName();
+            keyWordFieldList.add(tableInfo.getQueryColumnByProperty(name));
+        });
 
+        return this.keyWordQueryColumn = keyWordFieldList.toArray(new QueryColumn[0]);
+    }
 
     @Override
     public Long add(T entity) {
@@ -309,12 +402,12 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     public QueryWrapper listsBefore(PageParams<T> pageParams) {
         QueryWrapper queryWrapper = QueryWrapper.create()
                 .orderBy(pageParams.getOrder(), pageParams.getSort().toUpperCase(Locale.ENGLISH).equals("ASC"))
-                .select(this.getListSelectField());
+                .select(this.getListSelectQueryColumn());
 
         if (!StrUtil.isBlankIfStr(pageParams.getKeyWord())) {
             String keyWord = pageParams.getKeyWord().trim();
             queryWrapper.and(queryWrapper1 -> {
-                for (QueryColumn field : this.getKeyWordField()) {
+                for (QueryColumn field : this.getKeyWordQueryColumn()) {
                     queryWrapper1.or(field.like(keyWord));
                 }
             });
@@ -324,7 +417,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
             T params = pageParams.getParams();
             TableInfo tableInfo = TableInfoFactory.ofEntityClass(params.getClass());
 
-            for (Field field : params.getClass().getDeclaredFields()) {
+            for (Field field : this.getEqField()) {
                 field.setAccessible(true);
                 Object value = field.get(params);
 
