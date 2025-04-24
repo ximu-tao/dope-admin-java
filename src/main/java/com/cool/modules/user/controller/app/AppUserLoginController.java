@@ -195,7 +195,7 @@ public class AppUserLoginController {
 
         CoolPreconditions.checkEmpty(username);
         CoolPreconditions.checkEmpty(password);
-        return R.ok(userLoginService.register(username, password));
+        return R.ok(userLoginService.register(username, password), "注册成功");
     }
     
 }

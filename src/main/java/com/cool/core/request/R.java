@@ -68,6 +68,10 @@ public class R<T>  implements Serializable {
         return new R<B>(1000 , "ok", data);
     }
 
+    public static <B> R<B> ok(B data, String msg) {
+        return new R<B>(1000 , msg , data);
+    }
+
 
     public R<T> put(String key, Object value) {
         if ( key.equals( "code") ) {
