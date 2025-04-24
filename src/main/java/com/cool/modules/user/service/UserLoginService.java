@@ -53,5 +53,9 @@ public interface UserLoginService {
     /**
      * 密码登录
      */
-    Object password(String phone, String password);
+    Object password(String phoneOrUsername, String password);
+    
+    
+    
+    Object register(String username, String password);
 }

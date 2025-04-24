@@ -19,6 +19,10 @@ public class UserInfoEntity extends BaseEntity<UserInfoEntity> {
     @ColumnDefine(comment = "头像")
     private String avatarUrl;
 
+    @UniIndex
+    @ColumnDefine(comment = "登录用户名", length = 100 )
+    private String username;
+    
     @ColumnDefine(comment = "昵称")
     private String nickName;
 

@@ -20,7 +20,7 @@ public class LoginParam {
 
 
     /*******手机号登录*******/
-    @Schema(description = "手机号（验证码登录/密码登录）")
+    @Schema(description = "手机号（验证码登录/密码登录（密码登录时 手机号、用户名 二选一））")
     private String phone;
 
     @Schema(description = "验证码（验证码登录）")
@@ -36,6 +36,10 @@ public class LoginParam {
 
 
     /*******密码登录*******/
+    @Schema(description = "用户名（密码登录时 手机号、用户名 二选一）")
+    private String username;
+    
+    
     @Schema(description = "密码,密码登录")
     private String password;
 }

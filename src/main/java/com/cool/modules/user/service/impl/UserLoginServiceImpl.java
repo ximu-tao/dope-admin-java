@@ -27,6 +27,7 @@ import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -132,14 +133,39 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public Object password(String phone, String password) {
+    public Object password(String phoneOrUsername, String password) {
         UserInfoEntity userInfoEntity = userInfoService.getOne(
-            QueryWrapper.create().eq(UserInfoEntity::getPhone, phone));
+            QueryWrapper.create().eq(UserInfoEntity::getPhone, phoneOrUsername));
+        
+        if ( userInfoEntity == null ) {
+            userInfoEntity = userInfoService.getOne(
+                QueryWrapper.create().eq(UserInfoEntity::getUsername, phoneOrUsername));
+        }
+        
         CoolPreconditions.checkEmpty(userInfoEntity, "账号或密码错误");
         if (userInfoEntity.getPassword().equals(MD5.create().digestHex(password))) {
             return generateToken(userInfoEntity, null);
         }
         CoolPreconditions.checkEmpty(userInfoEntity, "账号或密码错误");
+        return null;
+    }
+    
+    @Override
+    public Object register(String username, String password) {
+        
+        try {
+            
+            UserInfoEntity userInfoEntity = new UserInfoEntity();
+            userInfoEntity.setUsername(username);
+            userInfoEntity.setPassword(MD5.create().digestHex(password));
+            userInfoEntity.setStatus( 1 );
+            userInfoEntity.setBlock(false);
+            userInfoEntity.setNickName( "新用户" + RandomUtil.randomString(4) );
+            userInfoEntity.save();
+            return generateToken( userInfoEntity , null );
+        } catch ( PersistenceException e ) {
+            CoolPreconditions.alwaysThrow( "用户名已被注册" );
+        }
         return null;
     }
 

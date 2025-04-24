@@ -172,11 +172,26 @@ public class AppUserLoginController {
     @PostMapping("/password")
     public R password(
         @RequestBody LoginParam param) {
-        String phone = param.getPhone();
+        String phoneOrUsername = param.getUsername()!=null? param.getUsername(): param.getPhone();
         String password = param.getPassword();
 
-        CoolPreconditions.checkEmpty(phone);
+        CoolPreconditions.checkEmpty( phoneOrUsername );
         CoolPreconditions.checkEmpty(password);
-        return R.ok(userLoginService.password(phone, password));
+        return R.ok(userLoginService.password( phoneOrUsername , password));
     }
+    
+    
+    @TokenIgnore
+    @Operation(summary = "密码注册")
+    @PostMapping("/register")
+    public R register(
+        @RequestBody LoginParam param) {
+        String username = param.getUsername();
+        String password = param.getPassword();
+
+        CoolPreconditions.checkEmpty(username);
+        CoolPreconditions.checkEmpty(password);
+        return R.ok(userLoginService.register(username, password));
+    }
+    
 }
