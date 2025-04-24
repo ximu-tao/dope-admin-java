@@ -146,7 +146,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         if (userInfoEntity.getPassword().equals(MD5.create().digestHex(password))) {
             return generateToken(userInfoEntity, null);
         }
-        CoolPreconditions.checkEmpty(userInfoEntity, "账号或密码错误");
+        CoolPreconditions.alwaysThrow("账号或密码错误");
         return null;
     }
     
