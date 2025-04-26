@@ -457,6 +457,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     public QueryWrapper listsBefore(PageParams<T> pageParams) {
 
+        RelationManager.addQueryRelations(pageParams.getWith().toArray(String[]::new));
+        
         QueryWrapper queryWrapper = QueryWrapper.create().select(this.getListSelectQueryColumn());
         this.buildOrder( pageParams,  queryWrapper )
                 .buildKeyWord( pageParams,  queryWrapper  )

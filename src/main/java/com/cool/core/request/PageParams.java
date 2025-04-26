@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+
 @Data
 @Schema( description = "分页查询数据模型")
 public class PageParams<T> {
@@ -37,6 +39,10 @@ public class PageParams<T> {
      */
     @Schema(description = "排序" , defaultValue = "desc")
     protected String sort = "desc";
+    
+    
+    @Schema(description = "关联查询" , defaultValue = "desc")
+    protected List<String> with;
 
 
     public Integer getPage() {
