@@ -20,7 +20,7 @@ public abstract class OnlyOneControllerAdapter<S extends BaseService<T>, T exten
 
     @Operation(summary = "", description = "")
     @PostMapping("/add")
-    protected R<Long> add(@Valid @RequestBody T requestParams) {
+    protected R<T> add(@Valid @RequestBody T requestParams) {
         return R.error("禁止使用此接口");
     }
 

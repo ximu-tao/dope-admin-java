@@ -27,7 +27,7 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
     
     @Operation(summary = "发布/新增/创建", description = "")
     @PostMapping("/add")
-    protected R<Long> add(@Valid @RequestBody T requestParams) {
+    protected R<T> add(@Valid @RequestBody T requestParams) {
         Long userId = CoolSecurityUtil.getCurrentUserId();
         
         if (requestParams instanceof BelongingUserEntity appEntity){
@@ -35,7 +35,7 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
         }
         
         Long add = service.create(requestParams);
-        return R.ok(add);
+        return R.ok(requestParams);
     }
 
     @Operation(summary = "删除", description = "默认仅支持ID删除，具体看子类实现")
