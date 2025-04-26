@@ -127,7 +127,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         return eqField = allField1.stream().filter(field -> {
             EpsField epsFieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, EpsField.class);
             if (epsFieldInfo != null) {
-                return !epsFieldInfo.excludeEq();
+//                作为 like 条件时，不再作为 eq 条件
+                return !( epsFieldInfo.like() || epsFieldInfo.excludeEq() );
             }
             return true;
         }).toList();
@@ -270,6 +271,25 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
                 return false;
             }).toList();
     }
+    
+    
+    
+    protected List<Field> likeField = null;
+    
+    protected List<Field> getLikeField() {
+        if (likeField != null) {
+            return likeField;
+        }
+
+        return likeField = getAllField().stream().filter(field -> {
+            EpsField epsFieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, EpsField.class);
+            if (epsFieldInfo != null) {
+                return epsFieldInfo.like();
+            }
+            return false;
+        }).toList();
+    }
+    
 
     @Override
     public Long add(T entity) {
@@ -507,7 +527,24 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
     
     protected BaseServiceImpl<M, T> buildLikeCondition( PageParams<T> pageParams, QueryWrapper qw ){
-//        TODO
+        try {
+            T params = pageParams.getParams();
+            
+            TableInfo tableInfo = getTableInfo();
+
+            for (Field field : this.getEqField()) {
+                field.setAccessible(true);
+                Object value = field.get(params);
+
+                if (value != null) {
+                    QueryColumn queryColumnByProperty = tableInfo.getQueryColumnByProperty(field.getName());
+
+                    qw.and(queryColumnByProperty.like( value ));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add conditions", e);
+        }
         
         return this;
     }

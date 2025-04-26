@@ -21,6 +21,12 @@ public @interface EpsField {
      */
     boolean excludeEq() default false;
 
+    
+    /**
+     * 支持 like 查询
+     */
+    boolean like() default false;
+    
     /**
      * 在 List、Page 的查询结果中排除
      * @return
