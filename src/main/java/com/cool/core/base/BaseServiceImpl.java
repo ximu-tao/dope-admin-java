@@ -250,6 +250,27 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         return this.keyWordQueryColumn = keyWordFieldList.toArray(new QueryColumn[0]);
     }
 
+    protected List<Field> immutableField = null;
+    
+    /**
+     * 获取不可变字段
+     * @return
+     */
+    protected List<Field> getImmutableField(){
+        if (immutableField != null) {
+            return immutableField;
+        }
+        return keyWordField = getAllField().stream()
+            .filter(field -> {
+
+                EpsField epsFieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, EpsField.class);
+                if (epsFieldInfo != null) {
+                    return epsFieldInfo.immutable();
+                }
+                return false;
+            }).toList();
+    }
+
     @Override
     public Long add(T entity) {
         mapper.insertSelective(entity);
@@ -386,6 +407,32 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         this.modifyAfter( null , entity, ModifyEnum.ADD);
         return add;
     }
+    
+    
+    
+    protected QueryWrapper buildModifyCondition( T params , ModifyEnum me ){
+
+        QueryWrapper qw = QueryWrapper.create();
+        try {
+
+            TableInfo tableInfo = getTableInfo();
+
+            for (Field field : this.getImmutableField()) {
+                field.setAccessible(true);
+                Object value = field.get(params);
+
+                if (value != null) {
+                    QueryColumn queryColumnByProperty = tableInfo.getQueryColumnByProperty(field.getName());
+
+                    qw.and(queryColumnByProperty.eq(value));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add conditions", e);
+        }
+        return qw;
+    }
+    
 
     @Override
     public Boolean delete(T entity) {
@@ -394,7 +441,10 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         if ( entity.getId() == null || entity.getId() <= 0 ) {
             CoolPreconditions.alwaysThrow("仅支持通过ID删除");
         }
-        boolean delete = this.delete( entity.getId());
+        
+        QueryWrapper qw = buildModifyCondition(entity, ModifyEnum.UPDATE);
+        
+        boolean delete = this.remove( qw );
         
         this.modifyAfter( null , entity, ModifyEnum.DELETE );
         return delete;
@@ -402,8 +452,16 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     @Override
     public Boolean modify(T entity) {
+        
+        if ( entity.getId() == null || entity.getId() <= 0 ) {
+             CoolPreconditions.alwaysThrow("ID不能为空");
+        }
+        
         this.modifyBefore( null , entity, ModifyEnum.UPDATE);
-        boolean update = this.update(entity);
+
+        QueryWrapper qw = buildModifyCondition(entity, ModifyEnum.UPDATE);
+        System.out.println( qw.toSQL() );
+        boolean update = this.mapper.updateByQuery( entity , qw ) > 0;
         this.modifyAfter( null , entity, ModifyEnum.UPDATE);
         return update;
     }

@@ -22,18 +22,18 @@ import org.dromara.autotable.annotation.Ignore;
 public abstract class BaseEntity<T extends Model<T>> extends Model<T> implements Serializable {
 
     @Id(keyType = KeyType.Auto, comment = "ID")
-    @EpsField( excludeEq = true )
+    @EpsField( excludeEq = true , immutable = true)
     @ColumnDefine(comment = "ID")
     protected Long id;
 
     @Column(onInsertValue = "now()")
     @ColumnDefine(comment = "创建时间")
-    @EpsField( excludeEq = true )
+    @EpsField( excludeEq = true , immutable = true)
     protected Date createTime;
 
     @Column(onInsertValue = "now()", onUpdateValue = "now()")
     @ColumnDefine(comment = "更新时间")
-    @EpsField( excludeEq = true )
+    @EpsField( excludeEq = true , immutable = true)
     protected Date updateTime;
 
     @Ignore

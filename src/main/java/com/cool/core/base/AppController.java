@@ -41,6 +41,9 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
     @Operation(summary = "删除", description = "默认仅支持ID删除，具体看子类实现")
     @PostMapping("/delete")
     protected R<Boolean> delete( @RequestBody T requestParams ) {
+        if (requestParams instanceof BelongingUserEntity appEntity){
+            appEntity.setUserId( CoolSecurityUtil.getCurrentUserId() );
+        }
         Boolean delete = service.delete(requestParams);
         return R.ok(delete);
     }
@@ -48,6 +51,10 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
     @Operation(summary = "修改", description = "修改")
     @PostMapping("/update")
     protected R<Boolean> update(@RequestBody T t) {
+        if (t instanceof BelongingUserEntity appEntity){
+            appEntity.setUserId( CoolSecurityUtil.getCurrentUserId() );
+        }
+        
         Boolean modify = service.modify(t);
         return R.ok(modify);
     }

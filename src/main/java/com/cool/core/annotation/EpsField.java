@@ -33,4 +33,12 @@ public @interface EpsField {
      */
     boolean quickQuery() default false;
     
+
+
+
+    /**
+     * 不可修改的字段（仅APP端接口有效）（注意： Update 或 Delete 时，如果该字段不为 null 会被作为 UPDATE 或 DELETE 条件）
+     * @return
+     */
+    boolean immutable() default false;
 }

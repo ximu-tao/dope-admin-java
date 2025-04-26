@@ -1,7 +1,9 @@
 package com.cool.modules.user.entity;
 
+import com.cool.core.annotation.EpsField;
 import com.cool.core.annotation.EspRemoteSelectField;
 import com.cool.core.base.BaseEntity;
+import com.cool.core.base.BelongingUserEntity;
 import com.mybatisflex.annotation.Table;
 import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import lombok.Getter;
@@ -14,11 +16,12 @@ import org.dromara.autotable.annotation.Index;
 @Getter
 @Setter
 @Table(value = "user_address", comment = "用户模块-收货地址")
-public class UserAddressEntity extends BaseEntity<UserAddressEntity> {
+public class UserAddressEntity extends BaseEntity<UserAddressEntity> implements BelongingUserEntity {
 
     @Index
     @ColumnDefine(comment = "用户ID", notNull = true)
     @EspRemoteSelectField( titleField = "nickName", clazz = UserInfoEntity.class)
+    @EpsField( immutable = true )
     private Long userId;
 
     @ColumnDefine(comment = "联系人", notNull = true)
