@@ -13,6 +13,8 @@ import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.query.QueryWrapper;
+
+import com.mybatisflex.core.relation.RelationManager;
 import com.mybatisflex.core.table.TableInfo;
 import com.mybatisflex.core.table.TableInfoFactory;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
@@ -50,6 +52,15 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
             return entityClass;
         }
         throw new IllegalStateException("Unable to determine entity class type");
+    }
+    
+    
+    private TableInfo tableInfo = null;
+    public TableInfo getTableInfo(){
+        if (tableInfo != null) {
+            return tableInfo;
+        }
+        return tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
     }
 
 
@@ -92,7 +103,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         List<QueryColumn> allQueryColumnList = new ArrayList<QueryColumn>();
 
         List<Field> allField1 = getAllField();
-        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+        TableInfo tableInfo = getTableInfo();
 
         allField1.forEach(field -> {
             String name = field.getName();
@@ -134,7 +145,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         List<QueryColumn> eqQueryColumnList = new ArrayList<QueryColumn>();
 
         List<Field> allField1 = getEqField();
-        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+        TableInfo tableInfo = getTableInfo();
 
         allField1.forEach(field -> {
             String name = field.getName();
@@ -177,7 +188,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
         List<QueryColumn> selectFieldList = new ArrayList<QueryColumn>();
 
-        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+        TableInfo tableInfo = getTableInfo();
 
         this.getListSelectField().forEach(field -> {
             String name = field.getName();
@@ -228,7 +239,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
         List<QueryColumn> keyWordFieldList = new ArrayList<QueryColumn>();
 
-        TableInfo tableInfo = TableInfoFactory.ofEntityClass(this.currentEntityClass());
+        TableInfo tableInfo = getTableInfo();
 
         List<Field> keyWordField1 = getKeyWordField();
         keyWordField1.forEach(field -> {
@@ -396,24 +407,30 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         this.modifyAfter( null , entity, ModifyEnum.UPDATE);
         return update;
     }
-
-    public QueryWrapper listsBefore(PageParams<T> pageParams) {
-        QueryWrapper queryWrapper = QueryWrapper.create()
-                .orderBy(pageParams.getOrder(), pageParams.getSort().toUpperCase(Locale.ENGLISH).equals("ASC"))
-                .select(this.getListSelectQueryColumn());
-
+    
+    protected BaseServiceImpl<M, T> buildOrder( PageParams<T> pageParams, QueryWrapper qw ){
+        qw.orderBy(pageParams.getOrder(), pageParams.getSort().toUpperCase(Locale.ENGLISH).equals("ASC"));
+        return this;
+    }
+    
+    
+    protected BaseServiceImpl<M, T> buildKeyWord( PageParams<T> pageParams, QueryWrapper qw ){
         if (!StrUtil.isBlankIfStr(pageParams.getKeyWord())) {
             String keyWord = pageParams.getKeyWord().trim();
-            queryWrapper.and(queryWrapper1 -> {
+            qw.and(queryWrapper1 -> {
                 for (QueryColumn field : this.getKeyWordQueryColumn()) {
                     queryWrapper1.or(field.like(keyWord));
                 }
             });
         }
-        
+        return this;
+    }
+    
+    protected BaseServiceImpl<M, T> buildEqCondition( PageParams<T> pageParams, QueryWrapper qw ){
         try {
             T params = pageParams.getParams();
-            TableInfo tableInfo = TableInfoFactory.ofEntityClass(params.getClass());
+            
+            TableInfo tableInfo = getTableInfo();
 
             for (Field field : this.getEqField()) {
                 field.setAccessible(true);
@@ -422,12 +439,29 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
                 if (value != null) {
                     QueryColumn queryColumnByProperty = tableInfo.getQueryColumnByProperty(field.getName());
 
-                    queryWrapper.and(queryColumnByProperty.eq(value));
+                    qw.and(queryColumnByProperty.eq(value));
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to add conditions", e);
         }
+        return this;
+    }
+    
+    protected BaseServiceImpl<M, T> buildLikeCondition( PageParams<T> pageParams, QueryWrapper qw ){
+//        TODO
+        
+        return this;
+    }
+    
+
+    public QueryWrapper listsBefore(PageParams<T> pageParams) {
+
+        QueryWrapper queryWrapper = QueryWrapper.create().select(this.getListSelectQueryColumn());
+        this.buildOrder( pageParams,  queryWrapper )
+                .buildKeyWord( pageParams,  queryWrapper  )
+                .buildEqCondition( pageParams,  queryWrapper )
+                .buildLikeCondition( pageParams,  queryWrapper );
 
         return queryWrapper;
     }
