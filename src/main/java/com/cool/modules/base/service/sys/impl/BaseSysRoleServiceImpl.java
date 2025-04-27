@@ -48,7 +48,7 @@ public class BaseSysRoleServiceImpl extends BaseServiceImpl<BaseSysRoleMapper, B
     }
 
     @Override
-    public BaseSysRoleEntity info(Long id) {
+    public BaseSysRoleEntity info(Long id, List<String> with) {
         BaseSysRoleEntity roleEntity = getById(id);
         Long[] menuIdList = new Long[0];
         Long[] departmentIdList = new Long[0];

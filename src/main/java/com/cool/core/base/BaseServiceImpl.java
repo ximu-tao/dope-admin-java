@@ -1,5 +1,6 @@
 package com.cool.core.base;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import cn.hutool.json.JSONObject;
@@ -356,9 +357,16 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     public <R> List<R> list(JSONObject requestParams, QueryWrapper queryWrapper, Class<R> asType) {
         return mapper.selectListByQueryAs(queryWrapper, asType);
     }
+    
+    protected void queryRelations( List<String> with ){
+        if ( ObjectUtil.isNotEmpty( with ) ){
+            RelationManager.addQueryRelations(with.toArray(String[]::new));
+        }
+    }
 
     @Override
-    public List<T> listWithRelations(JSONObject requestParams, QueryWrapper queryWrapper) {
+    public List<T> listWithRelations(JSONObject requestParams, QueryWrapper queryWrapper, List<String> with) {
+        queryRelations( with );
         return mapper.selectListWithRelationsByQuery(queryWrapper);
     }
 
@@ -375,17 +383,19 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     @Override
     public Page<T> pageWithRelations(JSONObject requestParams, Page<T> page,
-        QueryWrapper queryWrapper) {
+        QueryWrapper queryWrapper, List<String> with) {
+        queryRelations( with );
         return mapper.paginateWithRelations(page, queryWrapper);
     }
 
     @Override
-    public T info(JSONObject requestParams, Long id) {
-        return info(id);
+    public T info(JSONObject requestParams, Long id, List<String> with) {
+        return info(id, with);
     }
 
     @Override
-    public T info(Long id) {
+    public T info(Long id, List<String> with) {
+        queryRelations( with );
         return mapper.selectOneWithRelationsById(id);
     }
 
@@ -487,7 +497,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     @Override
     public QueryWrapper buildAppQueryWrapper(PageParams<T> pageParams) {
 
-        RelationManager.addQueryRelations(pageParams.getWith().toArray(String[]::new));
         
         QueryWrapper queryWrapper = QueryWrapper.create().select(this.getListSelectQueryColumn());
         this.buildOrder( pageParams,  queryWrapper )

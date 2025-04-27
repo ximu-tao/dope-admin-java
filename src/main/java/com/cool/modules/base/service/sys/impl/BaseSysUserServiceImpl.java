@@ -173,7 +173,7 @@ public class BaseSysUserServiceImpl extends BaseServiceImpl<BaseSysUserMapper, B
     }
 
     @Override
-    public BaseSysUserEntity info(Long id) {
+    public BaseSysUserEntity info(Long id, List<String> with) {
         BaseSysUserEntity userEntity = getById(id);
         Long[] roleIdList = baseSysPermsService.getRoles(id);
         BaseSysDepartmentEntity departmentEntity = baseSysDepartmentMapper.selectOneById(

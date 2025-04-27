@@ -81,7 +81,7 @@ public abstract class AdminController <S extends BaseService<T>, T extends BaseE
     protected R<T> info(@RequestAttribute() JSONObject requestParams,
         @RequestParam() Long id,
         @RequestAttribute(COOL_INFO_OP) CrudOption<T> option) {
-        T info = service.info(requestParams, id);
+        T info = service.info(requestParams, id, null);
         invokerTransform(option, info);
         return R.ok(info);
     }
@@ -97,7 +97,7 @@ public abstract class AdminController <S extends BaseService<T>, T extends BaseE
         @RequestAttribute(COOL_LIST_OP) CrudOption<T> option) {
         QueryModeEnum queryModeEnum = option.getQueryModeEnum();
         List list = (List) switch (queryModeEnum) {
-            case ENTITY_WITH_RELATIONS -> service.listWithRelations(requestParams, option.getQueryWrapper(currentEntityClass()));
+            case ENTITY_WITH_RELATIONS -> service.listWithRelations(requestParams, option.getQueryWrapper(currentEntityClass()), null);
             case CUSTOM -> transformList(service.list(requestParams, option.getQueryWrapper(currentEntityClass()), option.getAsType()), option.getAsType());
             default -> service.list(requestParams, option.getQueryWrapper(currentEntityClass()));
         };
@@ -118,7 +118,7 @@ public abstract class AdminController <S extends BaseService<T>, T extends BaseE
         Integer size = requestParams.getInt("size", 20);
         QueryModeEnum queryModeEnum = option.getQueryModeEnum();
         Page<T> obj = switch (queryModeEnum) {
-            case ENTITY_WITH_RELATIONS -> service.pageWithRelations(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()));
+            case ENTITY_WITH_RELATIONS -> service.pageWithRelations(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()), null);
             case CUSTOM -> transformPage(service.page(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()), option.getAsType()), option.getAsType());
             default -> service.page(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()));
         };

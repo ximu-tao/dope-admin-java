@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.TokenIgnore;
 import com.cool.core.exception.CoolPreconditions;
+import com.cool.core.request.OneParams;
 import com.cool.core.request.PageParams;
 import com.cool.core.request.PageResult;
 import com.cool.core.request.R;
@@ -50,7 +51,7 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
         
         if (t instanceof BelongingUserEntity appEntity){
 
-            BelongingUserEntity byId = (BelongingUserEntity)service.info(t.getId());
+            BelongingUserEntity byId = (BelongingUserEntity)service.info(t.getId(), null);
 
             if ( !byId.getUserId().equals( CoolSecurityUtil.getCurrentUserId() )  ){
                 return R.error("不是你的数据");
@@ -69,7 +70,7 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
         }
         
         if (t instanceof BelongingUserEntity ){
-            BelongingUserEntity byId = (BelongingUserEntity)service.info( t.getId() );
+            BelongingUserEntity byId = (BelongingUserEntity)service.info( t.getId() , null);
 
             if ( !byId.getUserId().equals( CoolSecurityUtil.getCurrentUserId() )  ){
                 return R.error("不是你的数据");
@@ -88,7 +89,7 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
     @PostMapping("/list")
     protected R<PageResult<T>> list( @Valid @RequestBody PageParams<T> pageParams, @RequestAttribute() JSONObject requestParams ) {
         
-        Page<T> TPage = this.service.pageWithRelations( requestParams, pageParams.toPage(), service.buildAppQueryWrapper(pageParams) );
+        Page<T> TPage = this.service.pageWithRelations( requestParams, pageParams.toPage(), service.buildAppQueryWrapper(pageParams), pageParams.getWith() );
 
         return R.ok(pageResult(TPage));
     }
@@ -103,16 +104,15 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
             appEntity.setUserId(CoolSecurityUtil.getCurrentUserId());
         }
         
-        Page<T> TPage = this.service.pageWithRelations( requestParams, pageParams.toPage(), service.buildAppQueryWrapper(pageParams) );
-        return R.ok(pageResult(TPage));
+        return this.list( pageParams, requestParams );
     }
     
     @TokenIgnore
     @Operation(summary = "数据详情", description = "")
     @PostMapping("/info")
-    protected R<T> info( Long id , @RequestAttribute() JSONObject requestParams){
+    protected R<T> info(@Valid @RequestBody OneParams oneParams, @RequestAttribute() JSONObject requestParams){
 
-        T byId = service.info( requestParams, id );
+        T byId = service.info( oneParams.getId(), oneParams.getWith() );
         
         if (ObjectUtil.isEmpty( byId )){
             return R.error( "找不到数据"  );
@@ -124,8 +124,10 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
 
     @Operation(summary = "我的数据详情", description = "")
     @PostMapping("/myInfo")
-    protected R<T> myInfo( Long id , @RequestAttribute() JSONObject requestParams ){
-        T byId = service.info( requestParams, id );
+    protected R<T> myInfo(@Valid @RequestBody OneParams oneParams, @RequestAttribute() JSONObject requestParams ){
+        R<T> r = this.info( oneParams , requestParams );
+        
+        T byId = r.getData();
         
         if (ObjectUtil.isEmpty( byId )){
             return R.error( "找不到数据"  );
@@ -138,7 +140,7 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
             }
         }
 
-        return R.ok(byId);
+        return r;
     }
     
     
