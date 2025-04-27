@@ -186,6 +186,18 @@ public interface BaseService<T> extends IService<T> {
      * @return 分页信息
      */
     Page<T> pageWithRelations(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, List<String> with);
+    
+    
+    /**
+     * 分页查询我的数据
+     * 带关联查询
+     *
+     * @param requestParams 请求参数
+     * @param page          分页信息
+     * @param queryWrapper  查询条件
+     * @return 分页信息
+     */
+    Page<T> pageWithRelationsForUser(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, List<String> with, Long userId);
 
     /**
      * 查询信息

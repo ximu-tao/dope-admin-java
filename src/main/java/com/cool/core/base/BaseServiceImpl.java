@@ -387,6 +387,13 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         queryRelations( with );
         return mapper.paginateWithRelations(page, queryWrapper);
     }
+    
+    @Override
+    public Page<T> pageWithRelationsForUser(JSONObject requestParams, Page<T> page,
+        QueryWrapper queryWrapper, List<String> with, Long userId) {
+        queryRelations( with );
+        return mapper.paginateWithRelations(page, queryWrapper);
+    }
 
     @Override
     public T info(JSONObject requestParams, Long id, List<String> with) {

@@ -6,11 +6,13 @@ import cn.hutool.json.JSONObject;
 import com.cool.core.base.BaseEntity;
 import com.cool.core.base.BaseService;
 import com.cool.core.base.BaseServiceImpl;
+import com.cool.core.base.BelongingUserEntity;
 import com.cool.core.cache.CoolCache;
 import com.cool.core.util.RedisUtils;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 
@@ -23,6 +25,7 @@ import java.util.List;
  * @param <M>
  * @param <T>
  */
+@Slf4j
 public class CacheService<M extends BaseMapper<T>, T extends BaseEntity<T>> extends BaseServiceImpl<M, T> implements BaseService<T> {
 
 
@@ -36,13 +39,15 @@ public class CacheService<M extends BaseMapper<T>, T extends BaseEntity<T>> exte
 
         String simpleName = this.getClass().getSimpleName();
 
-        T cacheObject = RedisUtils.getCacheObject(simpleName + "::info::" + id);
+        String cacheKey = simpleName + "::info::" + id;
+        T cacheObject = RedisUtils.getCacheObject( cacheKey );
         if (ObjectUtil.isNotEmpty(cacheObject)) {
+            log.info("缓存命中：" + cacheKey );
             return cacheObject;
         }
 
         T info = super.getById( id );
-        RedisUtils.setCacheObject(simpleName + "::info::" + id, info);
+        RedisUtils.setCacheObject( cacheKey , info);
         return info;
     }
 
@@ -57,8 +62,29 @@ public class CacheService<M extends BaseMapper<T>, T extends BaseEntity<T>> exte
 
         String simpleName = this.getClass().getSimpleName();
         String cacheName = simpleName + "::page::" + page.toString() + "::" + queryWrapper.toSQL();
+        return gettPage(requestParams, (Page<T>) page, queryWrapper, cacheName);
+
+    }
+
+
+    @Override
+    public Page<T> pageWithRelationsForUser(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, List<String> with, Long userId) {
+
+        if (ObjectUtil.isNotEmpty(with)) {
+//            有关联数据，涉及第三方表 不缓存
+            return super.pageWithRelationsForUser(requestParams, page, queryWrapper, with, userId);
+        }
+
+        String simpleName = this.getClass().getSimpleName();
+        String cacheName = simpleName + "::userid::" + userId + "::page::" + page.toString() + "::" + queryWrapper.toSQL();
+        return gettPage(requestParams, (Page<T>) page, queryWrapper, cacheName);
+
+    }
+
+    private Page<T> gettPage(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, String cacheName) {
         Page<T> cacheObject = RedisUtils.getCacheObject(cacheName);
         if (ObjectUtil.isNotEmpty(cacheObject)) {
+            log.info("缓存命中：" + cacheName );
             return cacheObject;
         }
 
@@ -69,7 +95,16 @@ public class CacheService<M extends BaseMapper<T>, T extends BaseEntity<T>> exte
         return tPage;
 
     }
-
+    
+    protected void clearUserCache( T entity ){
+        if (ObjectUtil.isEmpty(entity)) {
+            return;
+        }
+        String simpleName = this.getClass().getSimpleName();
+        if ( entity instanceof BelongingUserEntity userEntity) {
+                RedisUtils.deleteKeys(simpleName + "::userid::" + userEntity.getUserId() + "::page::*" );
+        }
+    }
 
     @Override
     public boolean update(T entity) {
@@ -80,6 +115,9 @@ public class CacheService<M extends BaseMapper<T>, T extends BaseEntity<T>> exte
             String simpleName = this.getClass().getSimpleName();
             RedisUtils.setCacheObject(simpleName + "::info::" + entity.getId(), entity);
             RedisUtils.deleteKeys(simpleName + "::page::*");
+            
+            this.clearUserCache( entity );
+            
         }
 
         return update;
@@ -94,6 +132,9 @@ public class CacheService<M extends BaseMapper<T>, T extends BaseEntity<T>> exte
             String simpleName = this.getClass().getSimpleName();
             RedisUtils.setCacheObject(simpleName + "::info::" + entity.getId(), entity);
             RedisUtils.deleteKeys(simpleName + "::page::*");
+            
+            this.clearUserCache( entity );
+            
         }
 
         return add;
@@ -102,15 +143,30 @@ public class CacheService<M extends BaseMapper<T>, T extends BaseEntity<T>> exte
 
     @Override
     public boolean delete(Long... ids) {
+        
+        String simpleName = this.getClass().getSimpleName();
+        if ( ids.length == 1 ){
+            T info = this.info(ids[0], null);
+            this.clearUserCache( info );
+            RedisUtils.deleteKeys(simpleName + "::page::*");
+        }else if ( ids.length < 5 ){
+            for ( Long id : ids ){
+                List<T> ts = this.listByIds(Arrays.asList(ids));
+                ts.forEach( this::clearUserCache );
+            }
+            RedisUtils.deleteKeys(simpleName + "::page::*");
+        }else {
+            RedisUtils.deleteKeys(simpleName + "::*");
+        }
+        
+        
         boolean delete = super.delete(ids);
 
         if (delete) {
 
-            String simpleName = this.getClass().getSimpleName();
             Arrays.stream(ids).forEach(id -> {
                 RedisUtils.deleteObject(simpleName + "::info::" + id);
             });
-            RedisUtils.deleteKeys(simpleName + "::page::*");
         }
 
         return delete;

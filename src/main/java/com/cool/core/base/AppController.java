@@ -103,8 +103,10 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
         if (params instanceof BelongingUserEntity appEntity){
             appEntity.setUserId(CoolSecurityUtil.getCurrentUserId());
         }
-        
-        return this.list( pageParams, requestParams );
+
+        Page<T> tPage = this.service.pageWithRelationsForUser(requestParams, pageParams.toPage(), service.buildAppQueryWrapper(pageParams), pageParams.getWith(), CoolSecurityUtil.getCurrentUserId());
+
+        return R.ok(pageResult(tPage));
     }
     
     @TokenIgnore
