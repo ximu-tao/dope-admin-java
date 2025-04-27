@@ -52,6 +52,13 @@ public interface BaseService<T> extends IService<T> {
      */
     QueryColumn[] getAllQueryColumn();
 
+
+    /**
+     * 获取当前 Service 的 Entity Class
+     * @return
+     */
+    Class<T> currentEntityClass();
+
     /**
      * 获取所有数据库字段
      *

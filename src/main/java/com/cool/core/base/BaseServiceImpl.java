@@ -7,7 +7,6 @@ import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.EpsField;
 import com.cool.core.annotation.QuickQueryField;
 import com.cool.core.annotation.ListSelectField;
-import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.PageParams;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
@@ -41,6 +40,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     protected Class<T> entityClass;
     
+    @Override
     public Class<T> currentEntityClass() {
         if (entityClass != null) {
             return this.entityClass;
