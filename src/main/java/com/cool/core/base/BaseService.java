@@ -87,7 +87,7 @@ public interface BaseService<T> extends IService<T> {
      * @param entity        对应的实体
      * @return ID
      */
-    Object add(JSONObject requestParams, T entity);
+    Long add(JSONObject requestParams, T entity);
 
     /**
      * 批量添加
@@ -96,7 +96,7 @@ public interface BaseService<T> extends IService<T> {
      * @param entitys       请求参数
      * @return ID 集合
      */
-    Object addBatch(JSONObject requestParams, List<T> entitys);
+    List<Long> addBatch(JSONObject requestParams, List<T> entitys);
 
     /**
      * 删除, 支持单个或者批量删除

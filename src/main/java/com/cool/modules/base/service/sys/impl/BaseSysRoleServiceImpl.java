@@ -38,7 +38,7 @@ public class BaseSysRoleServiceImpl extends BaseServiceImpl<BaseSysRoleMapper, B
     final private BaseSysPermsService baseSysPermsService;
 
     @Override
-    public Object add(JSONObject requestParams, BaseSysRoleEntity entity) {
+    public Long add(JSONObject requestParams, BaseSysRoleEntity entity) {
         BaseSysRoleEntity checkLabel = getOne(QueryWrapper.create().eq(BaseSysRoleEntity::getLabel, entity.getLabel()));
         if (checkLabel != null) {
             throw new CoolException("标识已存在");
