@@ -483,7 +483,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
             
             TableInfo tableInfo = getTableInfo();
 
-            for (Field field : this.getEqField()) {
+            for (Field field : this.getLikeField()) {
                 field.setAccessible(true);
                 Object value = field.get(params);
 
