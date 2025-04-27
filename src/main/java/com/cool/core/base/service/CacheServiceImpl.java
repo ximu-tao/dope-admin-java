@@ -1,13 +1,11 @@
 package com.cool.core.base.service;
 
-import cn.hutool.core.lang.func.Supplier4;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONObject;
 import com.cool.core.base.BaseEntity;
 import com.cool.core.base.BaseService;
 import com.cool.core.base.BaseServiceImpl;
 import com.cool.core.base.BelongingUserEntity;
-import com.cool.core.cache.CoolCache;
 import com.cool.core.util.RedisUtils;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
@@ -26,7 +24,7 @@ import java.util.List;
  * @param <T>
  */
 @Slf4j
-public class CacheService<M extends BaseMapper<T>, T extends BaseEntity<T>> extends BaseServiceImpl<M, T> implements BaseService<T> {
+public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> extends BaseServiceImpl<M, T> implements BaseService<T> {
 
 
     @Override

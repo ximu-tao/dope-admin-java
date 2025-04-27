@@ -191,6 +191,7 @@ public interface BaseService<T> extends IService<T> {
     /**
      * 分页查询我的数据
      * 带关联查询
+     * 注意 Long userId 仅用于区分缓存， QueryWrapper 中需要自行添加 user_id 条件
      *
      * @param requestParams 请求参数
      * @param page          分页信息
