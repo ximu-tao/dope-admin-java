@@ -349,7 +349,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
 
     @Override
-    public Object list(JSONObject requestParams, QueryWrapper queryWrapper) {
+    public List<T> list(JSONObject requestParams, QueryWrapper queryWrapper) {
         return this.list(queryWrapper);
     }
 
@@ -359,7 +359,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
 
     @Override
-    public Object listWithRelations(JSONObject requestParams, QueryWrapper queryWrapper) {
+    public List<T> listWithRelations(JSONObject requestParams, QueryWrapper queryWrapper) {
         return mapper.selectListWithRelationsByQuery(queryWrapper);
     }
 

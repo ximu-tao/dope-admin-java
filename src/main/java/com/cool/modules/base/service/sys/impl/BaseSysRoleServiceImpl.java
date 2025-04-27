@@ -86,7 +86,7 @@ public class BaseSysRoleServiceImpl extends BaseServiceImpl<BaseSysRoleMapper, B
     }
 
     @Override
-    public Object list(JSONObject requestParams, QueryWrapper queryWrapper) {
+    public List<BaseSysRoleEntity> list(JSONObject requestParams, QueryWrapper queryWrapper) {
         return baseSysRoleMapper.selectListByQuery(queryWrapper.ne(BaseSysRoleEntity::getId, 1L).and(qw -> {
             JSONObject object = CoolSecurityUtil.getAdminUserInfo(requestParams);
             qw.eq(BaseSysRoleEntity::getUserId, object.get("userId")).or(w -> {

@@ -135,7 +135,7 @@ public interface BaseService<T> extends IService<T> {
      * @param queryWrapper  查询条件
      * @return 列表信息
      */
-    Object list(JSONObject requestParams, QueryWrapper queryWrapper);
+    List<T> list(JSONObject requestParams, QueryWrapper queryWrapper);
 
     /**
      * 查询所有
@@ -154,7 +154,7 @@ public interface BaseService<T> extends IService<T> {
      * @param queryWrapper  查询条件
      * @return 列表信息
      */
-    Object listWithRelations(JSONObject requestParams, QueryWrapper queryWrapper);
+    List<T> listWithRelations(JSONObject requestParams, QueryWrapper queryWrapper);
 
     /**
      * 分页查询

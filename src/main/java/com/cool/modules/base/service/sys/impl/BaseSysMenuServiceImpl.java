@@ -38,7 +38,7 @@ public class BaseSysMenuServiceImpl extends BaseServiceImpl<BaseSysMenuMapper, B
     final private CoolEps coolEps;
 
     @Override
-    public Object list(JSONObject requestParams, QueryWrapper queryWrapper) {
+    public List<BaseSysMenuEntity> list(JSONObject requestParams, QueryWrapper queryWrapper) {
         List<BaseSysMenuEntity> list = baseSysPermsService.getMenus(CoolSecurityUtil.getAdminUsername());
         list.forEach(e -> {
             List<BaseSysMenuEntity> parent = list.stream()
