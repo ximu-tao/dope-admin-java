@@ -8,7 +8,6 @@ import com.cool.core.annotation.QuickQueryField;
 import com.cool.core.annotation.ListSelectField;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.PageParams;
-import com.cool.core.util.CoolSecurityUtil;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryColumn;
@@ -387,7 +386,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     @Override
     public T info(Long id) {
-        return mapper.selectOneById(id);
+        return mapper.selectOneWithRelationsById(id);
     }
 
     @Override
@@ -420,71 +419,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     }
 
-    @Override
-    public Long create(T entity) {
-        this.modifyBefore( null , entity, ModifyEnum.ADD);
-        Long add = this.add(entity);
-        this.modifyAfter( null , entity, ModifyEnum.ADD);
-        return add;
-    }
-    
-    
-    
-    protected QueryWrapper buildModifyCondition( T params , ModifyEnum me ){
-
-        QueryWrapper qw = QueryWrapper.create();
-        try {
-
-            TableInfo tableInfo = getTableInfo();
-
-            for (Field field : this.getImmutableField()) {
-                field.setAccessible(true);
-                Object value = field.get(params);
-
-                if (value != null) {
-                    QueryColumn queryColumnByProperty = tableInfo.getQueryColumnByProperty(field.getName());
-
-                    qw.and(queryColumnByProperty.eq(value));
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to add conditions", e);
-        }
-        return qw;
-    }
-    
-
-    @Override
-    public Boolean delete(T entity) {
-        this.modifyBefore( null , entity, ModifyEnum.DELETE );
-        
-        if ( entity.getId() == null || entity.getId() <= 0 ) {
-            CoolPreconditions.alwaysThrow("仅支持通过ID删除");
-        }
-        
-        QueryWrapper qw = buildModifyCondition(entity, ModifyEnum.UPDATE);
-        
-        boolean delete = this.remove( qw );
-        
-        this.modifyAfter( null , entity, ModifyEnum.DELETE );
-        return delete;
-    }
-
-    @Override
-    public Boolean modify(T entity) {
-        
-        if ( entity.getId() == null || entity.getId() <= 0 ) {
-             CoolPreconditions.alwaysThrow("ID不能为空");
-        }
-        
-        this.modifyBefore( null , entity, ModifyEnum.UPDATE);
-
-        QueryWrapper qw = buildModifyCondition(entity, ModifyEnum.UPDATE);
-        System.out.println( qw.toSQL() );
-        boolean update = this.mapper.updateByQuery( entity , qw ) > 0;
-        this.modifyAfter( null , entity, ModifyEnum.UPDATE);
-        return update;
-    }
     
     protected BaseServiceImpl<M, T> buildOrder( PageParams<T> pageParams, QueryWrapper qw ){
         qw.orderBy(pageParams.getOrder(), pageParams.getSort().toUpperCase(Locale.ENGLISH).equals("ASC"));
@@ -550,7 +484,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
     
 
-    public QueryWrapper listsBefore(PageParams<T> pageParams) {
+    @Override
+    public QueryWrapper buildAppQueryWrapper(PageParams<T> pageParams) {
 
         RelationManager.addQueryRelations(pageParams.getWith().toArray(String[]::new));
         
@@ -561,48 +496,5 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
                 .buildLikeCondition( pageParams,  queryWrapper );
 
         return queryWrapper;
-    }
-    
-    public void listsAfter(PageParams<T> pageParams ,  Page<T> page ){}
-    
-    @Override
-    public Page<T> lists(PageParams<T> pageParams) {
-        Page<T> tPage = this.mapper.paginateWithRelations(pageParams.toPage(), listsBefore(pageParams) );
-        this.listsAfter(pageParams, tPage);
-        return tPage;
-    }
-
-    @Override
-    public Page<T> myList(PageParams<T> pageParams) {
-        Page<T> tPage = this.mapper.paginateWithRelations(pageParams.toPage(), listsBefore(pageParams) );
-        this.listsAfter(pageParams, tPage);
-        return tPage;
-    }
-    
-    public void detailsBefore( Long id){}
-    public void detailsyAfter( T t){}
-    
-    @Override
-    public T details(Long id) {
-        this.detailsBefore(id);
-        T byId = this.mapper.selectOneWithRelationsById(id);
-        this.detailsyAfter( byId );
-        return byId;
-    }
-
-    @Override
-    public T myDetails(Long id) {
-        this.detailsBefore(id);
-        T byId = this.details(id);
-        
-        if (byId instanceof BelongingUserEntity appEntity){
-            
-            CoolPreconditions.check( !CoolSecurityUtil.getCurrentUserId().equals( appEntity.getUserId() ),
-                    "不是你的数据");
-
-        }
-        
-        this.detailsyAfter( byId );
-        return byId;
     }
 }

@@ -31,7 +31,7 @@ public class UserVipOrderServiceImpl extends PayableServiceAdapter<UserVipOrderM
     }
 
     @Override
-    public Long create(UserVipOrderEntity entity) {
+    public Long add(UserVipOrderEntity entity) {
         
         Long vipId = entity.getVipId();
         UserVipInfoEntity vip = userVipInfoService.getById(vipId);
@@ -41,7 +41,7 @@ public class UserVipOrderServiceImpl extends PayableServiceAdapter<UserVipOrderM
         entity.setDay(vip.getDay());
         entity.setPayStatus(PayStatusEnum.PAYING);
 
-        return super.create(entity);
+        return super.add(entity);
     }
     
     
@@ -75,7 +75,7 @@ public class UserVipOrderServiceImpl extends PayableServiceAdapter<UserVipOrderM
 
     @Override
     public void close(UserVipOrderEntity entity) {
-        this.delete(entity);
+        this.delete( entity.getId() );
     }
 
 

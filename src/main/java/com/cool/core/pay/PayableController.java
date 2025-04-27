@@ -1,5 +1,6 @@
 package com.cool.core.pay;
 
+import cn.hutool.json.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.cool.core.annotation.NoRepeatSubmit;
 import com.cool.core.annotation.TokenIgnore;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -61,11 +63,11 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         
     @Operation(summary = "创建订单", description = "创建订单后使用返回ID值调用同目录 pay 接口")
     @PostMapping("/add")
-    public R<T> add(@Valid @RequestBody T requestParams) {
+    @Override
+    public R<T> add(@Valid @RequestBody T requestParams, @RequestAttribute() JSONObject jsontParams) {
         Long userId = CoolSecurityUtil.getCurrentUserId();
         requestParams.setUserId(userId);
-        Long add = service.create(requestParams);
-        return R.ok(requestParams);
+        return super.add(requestParams, jsontParams);
     }
 
     
