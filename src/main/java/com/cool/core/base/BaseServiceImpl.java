@@ -381,12 +381,12 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
 
     @Override
-    public Object info(JSONObject requestParams, Long id) {
+    public T info(JSONObject requestParams, Long id) {
         return info(id);
     }
 
     @Override
-    public Object info(Long id) {
+    public T info(Long id) {
         return mapper.selectOneById(id);
     }
 

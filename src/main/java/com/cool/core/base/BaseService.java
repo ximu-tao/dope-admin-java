@@ -192,7 +192,7 @@ public interface BaseService<T> extends IService<T> {
      *
      * @param id ID
      */
-    Object info(Long id);
+    T info(Long id);
 
     /**
      * 查询信息
@@ -200,7 +200,7 @@ public interface BaseService<T> extends IService<T> {
      * @param requestParams 请求参数
      * @param id            ID
      */
-    Object info(JSONObject requestParams, Long id);
+    T info(JSONObject requestParams, Long id);
 
     /**
      * 修改之后

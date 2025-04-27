@@ -81,7 +81,7 @@ public abstract class AdminController <S extends BaseService<T>, T extends BaseE
     protected R<T> info(@RequestAttribute() JSONObject requestParams,
         @RequestParam() Long id,
         @RequestAttribute(COOL_INFO_OP) CrudOption<T> option) {
-        T info = (T) service.info(requestParams, id);
+        T info = service.info(requestParams, id);
         invokerTransform(option, info);
         return R.ok(info);
     }
