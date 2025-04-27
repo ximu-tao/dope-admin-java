@@ -37,8 +37,8 @@ public class RecycleDataServiceImpl extends BaseServiceImpl<RecycleDataMapper, R
     final private MapperProviderService mapperProviderService;
 
     @Override
-    public Object page(JSONObject requestParams, Page<RecycleDataEntity> page,
-        QueryWrapper queryWrapper) {
+    public Page<RecycleDataEntity> page(JSONObject requestParams, Page<RecycleDataEntity> page,
+                                        QueryWrapper queryWrapper) {
         String keyWord = requestParams.getStr("keyWord");
         if (ObjUtil.isNotEmpty(keyWord)) {
             List<Long> list = baseSysUserService

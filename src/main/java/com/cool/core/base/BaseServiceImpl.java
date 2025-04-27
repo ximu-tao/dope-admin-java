@@ -364,7 +364,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
 
     @Override
-    public Object page(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper) {
+    public Page<T> page(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper) {
         return this.page(page, queryWrapper);
     }
 
@@ -375,7 +375,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     }
 
     @Override
-    public Object pageWithRelations(JSONObject requestParams, Page<T> page,
+    public Page<T> pageWithRelations(JSONObject requestParams, Page<T> page,
         QueryWrapper queryWrapper) {
         return mapper.paginateWithRelations(page, queryWrapper);
     }

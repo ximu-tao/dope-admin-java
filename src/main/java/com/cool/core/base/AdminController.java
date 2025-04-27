@@ -117,14 +117,13 @@ public abstract class AdminController <S extends BaseService<T>, T extends BaseE
         Integer page = requestParams.getInt("page", 1);
         Integer size = requestParams.getInt("size", 20);
         QueryModeEnum queryModeEnum = option.getQueryModeEnum();
-        Object obj = switch (queryModeEnum) {
+        Page<T> obj = switch (queryModeEnum) {
             case ENTITY_WITH_RELATIONS -> service.pageWithRelations(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()));
             case CUSTOM -> transformPage(service.page(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()), option.getAsType()), option.getAsType());
             default -> service.page(requestParams, new Page<>(page, size), option.getQueryWrapper(currentEntityClass()));
         };
-        Page pageResult = (Page) obj;
-        invokerTransform(option, pageResult.getRecords());
-        return R.ok(pageResult(pageResult));
+        invokerTransform(option, obj.getRecords());
+        return R.ok(pageResult(obj));
     }
     
         /**

@@ -164,7 +164,7 @@ public interface BaseService<T> extends IService<T> {
      * @param queryWrapper  查询条件
      * @return 分页信息
      */
-    Object page(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper);
+    Page<T> page(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper);
 
     /**
      * 分页查询
@@ -185,7 +185,7 @@ public interface BaseService<T> extends IService<T> {
      * @param queryWrapper  查询条件
      * @return 分页信息
      */
-    Object pageWithRelations(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper);
+    Page<T> pageWithRelations(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper);
 
     /**
      * 查询信息

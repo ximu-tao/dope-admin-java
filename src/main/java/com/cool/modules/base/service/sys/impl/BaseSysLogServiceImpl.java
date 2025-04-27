@@ -44,7 +44,7 @@ public class BaseSysLogServiceImpl extends BaseServiceImpl<BaseSysLogMapper, Bas
 	private final Executor logTaskExecutor;
 
 	@Override
-	public Object page(
+	public Page<BaseSysLogEntity> page(
 		JSONObject requestParams, Page<BaseSysLogEntity> page, QueryWrapper queryWrapper) {
 		queryWrapper
 			.select(

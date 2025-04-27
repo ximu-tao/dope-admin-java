@@ -47,7 +47,7 @@ public class BaseSysUserServiceImpl extends BaseServiceImpl<BaseSysUserMapper, B
     final private BaseSysDepartmentMapper baseSysDepartmentMapper;
 
     @Override
-    public Object page(JSONObject requestParams, Page<BaseSysUserEntity> page, QueryWrapper qw) {
+    public Page<BaseSysUserEntity> page(JSONObject requestParams, Page<BaseSysUserEntity> page, QueryWrapper qw) {
         String keyWord = requestParams.getStr("keyWord");
         Integer status = requestParams.getInt("status");
         Long[] departmentIds = requestParams.get("departmentIds", Long[].class);

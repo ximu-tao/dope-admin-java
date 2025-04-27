@@ -9,7 +9,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 public interface RecycleDataService extends BaseService<RecycleDataEntity> {
-    Object page(JSONObject requestParams, Page<RecycleDataEntity> page, QueryWrapper queryWrapper);
+    Page<RecycleDataEntity> page(JSONObject requestParams, Page<RecycleDataEntity> page, QueryWrapper queryWrapper);
 
     /**
      * 恢复数据
