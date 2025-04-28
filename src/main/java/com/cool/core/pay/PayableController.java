@@ -75,7 +75,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
     @Operation(summary = "关闭订单", description = "关闭订单，默认仅支持ID参数")
     @PostMapping("/close")
     protected R<Boolean> close( @RequestBody T entity){
-        T info = service.getById( entity.getId() );
+        T info = service.info( entity.getId() , null );
         CoolPreconditions.checkEmpty(info , "找不到订单");
         
         if ( PayStatusEnum.PAYED.equals( info.getPayStatus() ) ){
@@ -123,7 +123,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
 
         log.info("调用支付，ID: {}", pay.getId() );
 
-        T info = service.getById( pay.getId() );
+        T info = service.info( pay.getId(), null );
         
         CoolPreconditions.checkEmpty(info , "找不到订单");
         
@@ -240,7 +240,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
                 T order = service.getByOutTradeNo( outTradeNo );
                 order.setPayStatus(PayStatusEnum.PAYED );
                 order.setPayTime( LocalDateTime.now() );
-                service.updateById( order );
+                service.update( order );
                 
 
                 service.payNotice(outTradeNo);
@@ -284,7 +284,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
             T order = service.getByOutTradeNo(params.get("out_trade_no"));
             order.setPayStatus(PayStatusEnum.PAYED );
             order.setPayTime( LocalDateTime.now() );
-            service.updateById( order) ;
+            service.update( order) ;
                 
             
 
