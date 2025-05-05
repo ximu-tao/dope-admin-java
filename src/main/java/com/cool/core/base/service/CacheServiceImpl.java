@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.util.Arrays;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 
 /**
@@ -34,6 +35,47 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
 
     private static final Duration LOCK_TIMEOUT = Duration.ofMillis(2000);
 
+    private String simpleName = null;
+
+    protected String getSimpleName() {
+        if (simpleName != null) {
+            return simpleName;
+        }
+        return this.simpleName = this.getClass().getSimpleName();
+    }
+
+    protected String generateCacheKey( String... parts) {
+        StringBuilder key = new StringBuilder(this.getSimpleName());
+        for (Object part : parts) {
+            key.append("::").append(part);
+        }
+        return key.toString();
+    }
+    
+    protected <R> R getOrSetCache(String cacheKey, Supplier<R> supplier) {
+        R cacheObject = RedisUtils.getCacheObject(cacheKey);
+        if (ObjectUtil.isNotEmpty(cacheObject)) {
+            log.debug("cache hit : {}", cacheKey);
+            return cacheObject;
+        }
+        log.debug("cache not hit : {}", cacheKey);
+
+        if (coolLock.tryLock(cacheKey, LOCK_TIMEOUT)) {
+            try {
+                cacheObject = RedisUtils.getCacheObject(cacheKey);
+                if (ObjectUtil.isEmpty(cacheObject)) {
+                    
+                    cacheObject = supplier.get();
+                    
+                    RedisUtils.setCacheObject(cacheKey, cacheObject);
+                }
+            } finally {
+                coolLock.unlock(cacheKey);
+            }
+        }
+        return cacheObject;
+    }
+
     @Override
     public T info(Long id, List<String> with) {
 
@@ -41,37 +83,23 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
 //            有关联数据，涉及第三方表 不缓存
             return super.info(id, with);
         }
+        
+        String cacheKey = generateCacheKey( "info", id.toString());
 
-        String simpleName = this.getClass().getSimpleName();
-
-        String cacheKey = simpleName + "::info::" + id;
-        T cacheObject = RedisUtils.getCacheObject(cacheKey);
-        if (ObjectUtil.isNotEmpty(cacheObject)) {
-            log.debug("cache hit : {}", cacheKey);
-            return cacheObject;
-        }
-        log.debug("cache not hit : {}", cacheKey);
-
-
-        if (coolLock.tryLock(cacheKey, LOCK_TIMEOUT)) {
-            try {
-
-                T tryCacheObject = RedisUtils.getCacheObject(cacheKey);
-                if (!ObjectUtil.isNotEmpty(tryCacheObject)) {
-                    T info = super.getById(id);
-                    RedisUtils.setCacheObject(cacheKey, info);
-                    cacheObject = info;
-                }
-            } finally {
-                coolLock.unlock(cacheKey);
-            }
-
-        }
-
-
-        return cacheObject;
+        return this.getOrSetCache(cacheKey, () -> super.getById(id));
     }
 
+    @Override
+    public Page<T> page( Page<T> page, QueryWrapper queryWrapper) {
+        String cacheKey = generateCacheKey( "page", page.toString(), "query", queryWrapper.toString());
+        return this.getOrSetCache(cacheKey, () -> super.page( page, queryWrapper));
+    }
+
+    @Override
+    public List<T> list( QueryWrapper queryWrapper) {
+        String cacheKey = generateCacheKey( "list", queryWrapper.toString());
+        return this.getOrSetCache(cacheKey, () -> super.list( queryWrapper));
+    }
 
     @Override
     public Page<T> pageWithRelations(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, List<String> with) {
@@ -81,9 +109,7 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
             return super.pageWithRelations(requestParams, page, queryWrapper, with);
         }
 
-        String simpleName = this.getClass().getSimpleName();
-        String cacheKey = simpleName + "::page::" + page.toString() + "::" + queryWrapper.toSQL();
-        return gettPage(requestParams, page, queryWrapper, cacheKey);
+        return this.page(requestParams, page, queryWrapper);
 
     }
 
@@ -96,39 +122,9 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
             return super.pageWithRelationsForUser(requestParams, page, queryWrapper, with, userId);
         }
 
-        String simpleName = this.getClass().getSimpleName();
-        String cacheKey = simpleName + "::userid::" + userId + "::page::" + page.toString() + "::" + queryWrapper.toSQL();
-        return gettPage(requestParams, page, queryWrapper, cacheKey);
-
-    }
-
-    private Page<T> gettPage(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, String cacheKey) {
-        Page<T> cacheObject = RedisUtils.getCacheObject(cacheKey);
-        if (ObjectUtil.isNotEmpty(cacheObject)) {
-            log.debug("cache hit : {}", cacheKey);
-            return cacheObject;
-        }
-        log.debug("cache not hit :{}", cacheKey);
-
-
-        if (coolLock.tryLock(cacheKey, LOCK_TIMEOUT)) {
-            try {
-                T tryCacheObject = RedisUtils.getCacheObject(cacheKey);
-                if (!ObjectUtil.isNotEmpty(tryCacheObject)) {
-
-                    Page<T> tPage = super.page(requestParams, page, queryWrapper);
-
-
-                    RedisUtils.setCacheObject(cacheKey, tPage);
-
-                    cacheObject = tPage;
-                }
-            } finally {
-                coolLock.unlock(cacheKey);
-            }
-        }
-
-        return cacheObject;
+        String cacheKey = generateCacheKey("userid", userId.toString(), "page", page.toString(), "query", queryWrapper.toString());
+        
+        return getOrSetCache( cacheKey, () -> super.page( page, queryWrapper) );
 
     }
 
@@ -136,10 +132,19 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
         if (ObjectUtil.isEmpty(entity)) {
             return;
         }
-        String simpleName = this.getClass().getSimpleName();
         if (entity instanceof BelongingUserEntity userEntity) {
-            RedisUtils.deleteKeys(simpleName + "::userid::" + userEntity.getUserId() + "::page::*");
+            RedisUtils.deleteKeys( generateCacheKey( "userid", userEntity.getUserId().toString(), "page", "*" ) );
         }
+    }
+    
+    protected void updateCache(T entity) {
+        RedisUtils.deleteKeys(generateCacheKey( "page", "*" ) );
+        RedisUtils.deleteKeys(generateCacheKey( "list", "*" ) );
+        if (ObjectUtil.isEmpty(entity)) {
+            return;
+        }
+        RedisUtils.setCacheObject( generateCacheKey( "info", entity.getId().toString()) , entity);
+        this.clearUserCache(entity);
     }
 
     @Override
@@ -148,11 +153,7 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
         boolean update = super.update(entity);
 
         if (update) {
-            String simpleName = this.getClass().getSimpleName();
-            RedisUtils.setCacheObject(simpleName + "::info::" + entity.getId(), entity);
-            RedisUtils.deleteKeys(simpleName + "::page::*");
-
-            this.clearUserCache(entity);
+            this.updateCache(entity);
 
         }
 
@@ -165,11 +166,8 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
         Long add = super.add(entity);
 
         if (add != null && add > 0) {
-            String simpleName = this.getClass().getSimpleName();
-            RedisUtils.setCacheObject(simpleName + "::info::" + entity.getId(), entity);
-            RedisUtils.deleteKeys(simpleName + "::page::*");
 
-            this.clearUserCache(entity);
+            this.updateCache(entity);
 
         }
 
@@ -180,19 +178,16 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
     @Override
     public boolean delete(Long... ids) {
 
-        String simpleName = this.getClass().getSimpleName();
         if (ids.length == 1) {
             T info = this.info(ids[0], null);
             this.clearUserCache(info);
-            RedisUtils.deleteKeys(simpleName + "::page::*");
         } else if (ids.length < 5) {
             List<T> ts = this.listByIds(Arrays.asList(ids));
             ts.forEach(this::clearUserCache);
-
-            RedisUtils.deleteKeys(simpleName + "::page::*");
-        } else {
-            RedisUtils.deleteKeys(simpleName + "::*");
+            
         }
+        
+        this.updateCache(null);
 
 
         boolean delete = super.delete(ids);
@@ -200,7 +195,7 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
         if (delete) {
 
             Arrays.stream(ids).forEach(id -> {
-                RedisUtils.deleteObject(simpleName + "::info::" + id);
+                RedisUtils.deleteObject(generateCacheKey("info", id.toString()) );
             });
         }
 
