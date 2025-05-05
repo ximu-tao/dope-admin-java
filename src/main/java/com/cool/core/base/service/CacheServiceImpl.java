@@ -53,7 +53,12 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
     }
     
     protected <R> R getOrSetCache(String cacheKey, Supplier<R> supplier) {
-        R cacheObject = RedisUtils.getCacheObject(cacheKey);
+        R cacheObject = null;
+        try {
+            cacheObject = RedisUtils.getCacheObject(cacheKey);
+        }catch ( Exception e ){
+            RedisUtils.deleteKeys( generateCacheKey("*") );
+        }
         if (ObjectUtil.isNotNull(cacheObject)) {
             log.debug("cache hit : {}", cacheKey);
             return cacheObject;
