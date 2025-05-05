@@ -42,7 +42,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * @param <S>
  * @param <T>
  */
-public abstract class BaseController<S extends BaseService<T>, T extends BaseEntity<T>> {
+public abstract class BaseController<S extends BaseService<T>, T extends BaseEntity<T>> implements IController<S,T>{
 
     @Getter
     @Autowired
