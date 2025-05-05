@@ -6,12 +6,15 @@ import com.cool.core.base.BaseEntity;
 import com.cool.core.base.BaseService;
 import com.cool.core.base.BaseServiceImpl;
 import com.cool.core.base.BelongingUserEntity;
+import com.cool.core.lock.CoolLock;
 import com.cool.core.util.RedisUtils;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 import java.util.List;
@@ -26,6 +29,8 @@ import java.util.List;
 @Slf4j
 public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> extends BaseServiceImpl<M, T> implements BaseService<T> {
 
+    @Autowired
+    private CoolLock coolLock;
 
     @Override
     public T info(Long id, List<String> with) {
@@ -44,9 +49,21 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
             return cacheObject;
         }
 
-        T info = super.getById( id );
-        RedisUtils.setCacheObject( cacheKey , info);
-        return info;
+
+        if (coolLock.tryLock(cacheKey, Duration.ofMillis( 2000 ) )) {
+
+            T tryCacheObject = RedisUtils.getCacheObject( cacheKey );
+            if (  !ObjectUtil.isNotEmpty( tryCacheObject )) {
+                T info = super.getById( id );
+                RedisUtils.setCacheObject( cacheKey , info);
+                cacheObject = info;
+            }
+            
+            coolLock.unlock( cacheKey );
+        }
+        
+
+        return cacheObject;
     }
 
 
@@ -59,8 +76,8 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
         }
 
         String simpleName = this.getClass().getSimpleName();
-        String cacheName = simpleName + "::page::" + page.toString() + "::" + queryWrapper.toSQL();
-        return gettPage(requestParams, (Page<T>) page, queryWrapper, cacheName);
+        String cacheKey = simpleName + "::page::" + page.toString() + "::" + queryWrapper.toSQL();
+        return gettPage(requestParams, (Page<T>) page, queryWrapper, cacheKey);
 
     }
 
@@ -74,23 +91,37 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
         }
 
         String simpleName = this.getClass().getSimpleName();
-        String cacheName = simpleName + "::userid::" + userId + "::page::" + page.toString() + "::" + queryWrapper.toSQL();
-        return gettPage(requestParams, (Page<T>) page, queryWrapper, cacheName);
+        String cacheKey = simpleName + "::userid::" + userId + "::page::" + page.toString() + "::" + queryWrapper.toSQL();
+        return gettPage(requestParams, (Page<T>) page, queryWrapper, cacheKey);
 
     }
 
-    private Page<T> gettPage(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, String cacheName) {
-        Page<T> cacheObject = RedisUtils.getCacheObject(cacheName);
+    private Page<T> gettPage(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, String cacheKey) {
+        Page<T> cacheObject = RedisUtils.getCacheObject(cacheKey);
         if (ObjectUtil.isNotEmpty(cacheObject)) {
-            log.info("缓存命中：" + cacheName );
+            log.info("缓存命中：" + cacheKey );
             return cacheObject;
         }
+        
+        
+        
+        if (coolLock.tryLock(cacheKey, Duration.ofMillis( 2000 ) )) {
 
-        Page<T> tPage = super.page(requestParams, page, queryWrapper );
-
-        RedisUtils.setCacheObject(cacheName, tPage);
-
-        return tPage;
+            T tryCacheObject = RedisUtils.getCacheObject( cacheKey );
+            if (  !ObjectUtil.isNotEmpty( tryCacheObject )) {
+                
+                Page<T> tPage = super.page(requestParams, page, queryWrapper );
+                
+                
+                 RedisUtils.setCacheObject(cacheKey, tPage);
+                 
+                 cacheObject = tPage;
+            }
+            
+            coolLock.unlock( cacheKey );
+        }
+        
+        return cacheObject;
 
     }
     
