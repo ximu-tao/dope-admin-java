@@ -361,6 +361,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
     protected void queryRelations( List<String> with ){
         if ( ObjectUtil.isNotEmpty( with ) ){
             RelationManager.addQueryRelations(with.toArray(String[]::new));
+        }else {
+            RelationManager.addQueryRelations("");
         }
     }
 
