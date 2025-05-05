@@ -91,13 +91,13 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
 
     @Override
     public Page<T> page( Page<T> page, QueryWrapper queryWrapper) {
-        String cacheKey = generateCacheKey( "page", page.toString(), "query", queryWrapper.toString());
+        String cacheKey = generateCacheKey( "page", page.toString(), "query", queryWrapper.toSQL());
         return this.getOrSetCache(cacheKey, () -> super.page( page, queryWrapper));
     }
 
     @Override
     public List<T> list( QueryWrapper queryWrapper) {
-        String cacheKey = generateCacheKey( "list", queryWrapper.toString());
+        String cacheKey = generateCacheKey( "list", queryWrapper.toSQL());
         return this.getOrSetCache(cacheKey, () -> super.list( queryWrapper));
     }
 
@@ -122,7 +122,7 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
             return super.pageWithRelationsForUser(requestParams, page, queryWrapper, with, userId);
         }
 
-        String cacheKey = generateCacheKey("userid", userId.toString(), "page", page.toString(), "query", queryWrapper.toString());
+        String cacheKey = generateCacheKey("userid", userId.toString(), "page", page.toString(), "query", queryWrapper.toSQL());
         
         return getOrSetCache( cacheKey, () -> super.page( page, queryWrapper) );
 
