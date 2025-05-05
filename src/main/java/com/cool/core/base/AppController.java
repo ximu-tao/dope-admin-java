@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 
 public abstract class AppController <S extends BaseService<T>, T extends BaseEntity<T>> extends BaseController<S,T> {
     @Override
@@ -92,6 +94,16 @@ public abstract class AppController <S extends BaseService<T>, T extends BaseEnt
         Page<T> TPage = this.service.pageWithRelations( requestParams, pageParams.toPage(), service.buildAppQueryWrapper(pageParams), pageParams.getWith() );
 
         return R.ok(pageResult(TPage));
+    }
+    
+    @TokenIgnore
+    @Operation(summary = "查询所有数据", description = "")
+    @PostMapping("/lists")
+    protected R<List<T>> lists( @Valid @RequestBody PageParams<T> pageParams, @RequestAttribute() JSONObject requestParams ) {
+        
+        List<T> TPage = this.service.listWithRelations( requestParams, service.buildAppQueryWrapper(pageParams), pageParams.getWith() );
+
+        return R.ok(TPage);
     }
     
     
