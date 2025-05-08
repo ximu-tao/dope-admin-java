@@ -107,6 +107,15 @@ public class CacheServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> 
     }
 
     @Override
+    public List<T> listWithRelations(JSONObject requestParams, QueryWrapper queryWrapper, List<String> with) {
+        if (ObjectUtil.isNotEmpty(with)) {
+//            有关联数据，涉及第三方表 不缓存
+            return super.listWithRelations(requestParams, queryWrapper, with);
+        }
+        return this.list(queryWrapper);
+    }
+
+    @Override
     public Page<T> pageWithRelations(JSONObject requestParams, Page<T> page, QueryWrapper queryWrapper, List<String> with) {
 
         if (ObjectUtil.isNotEmpty(with)) {
