@@ -26,7 +26,7 @@ public abstract class OnlyOneControllerAdapter<S extends BaseService<T>, T exten
     @Operation(summary = "", description = "")
     @PostMapping("/add")
     @Override
-    protected R<T> add(@Valid @RequestBody T params,@RequestAttribute() JSONObject requestParams) {
+    public R<T> add(@Valid @RequestBody T params,@RequestAttribute() JSONObject requestParams) {
         return R.error("禁止使用此接口");
     }
 
