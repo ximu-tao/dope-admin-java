@@ -136,7 +136,7 @@
       "logo": "",
       "author": "COOL官方",
       "status": 0,
-      "plugin_json": "",
+      "plugin_json": {},
       "config": "{\"appId\": \"\", \"secretId\": \"\", \"signName\": \"\", \"template\": \"\", \"secretKey\": \"\"}"
     },
     {
@@ -149,7 +149,7 @@
       "logo": "",
       "author": "COOL官方",
       "status": 0,
-      "plugin_json": "",
+      "plugin_json": {},
       "config": "{\"key\": \"\", \"appid\": \"\", \"mchid\": \"\", \"notify_url\": \"\", \"privateKeyPath\": \"\", \"privateCertPath\": \"\"}"
     },
     {
@@ -162,7 +162,7 @@
       "logo": "",
       "author": "COOL官方",
       "status": 0,
-      "plugin_json": "",
+      "plugin_json": {},
       "config": "{\"MiniApp\": {\"appid\": \"\", \"secret\": \"\"}, \"OfficialAccount\": {\"appId\": \"公众号的 app key\", \"token\": \"公众号的 token\", \"aesKey\": \"EncodingAESKey\", \"secret\": \"公众号的 app secret\", \"useStableAccessToken\": true}}"
     },
     {
@@ -175,7 +175,7 @@
       "logo": "",
       "author": "XimuTao",
       "status": 0,
-      "plugin_json": "",
+      "plugin_json": {},
       "config": "{\"log\": \"\", \"pid\": \"\", \"mode\": \"normal\", \"app_id\": \"\", \"scanpay\": \"\", \"signtype\": \"cert\", \"notify_url\": \"/\", \"return_url\": \"/\", \"server_url\": \"https://openapi.alipay.com/gateway.do\", \"private_key\": \"\", \"ali_public_key\": \"\", \"alipay_root_cert\": \"\", \"app_cert_public_key\": \"\"}"
     },
     {
@@ -188,7 +188,7 @@
       "logo": "",
       "author": "COOL官方",
       "status": 0,
-      "plugin_json": "{\"key\": \"upload-cos\", \"hook\": \"upload\", \"logo\": \"assets/logo.png\", \"name\": \"腾讯云cos\", \"author\": \"COOL官方\", \"config\": {\"bucket\": \"必须，腾讯云bucket\", \"region\": \"必须，腾讯云cos的区域\", \"accessKeyId\": \"必须，腾讯云accessKeyId\", \"publicDomain\": \"必须，腾讯云oss的公共域名\", \"accessKeySecret\": \"必须，腾讯云accessKeySecret\"}, \"readme\": \"assets/README.md\", \"jarPath\": \"\", \"version\": \"1.0.0\", \"description\": \"腾讯云文件上传，替换系统的文件上传为cos方式\"}",
+      "plugin_json": {},
       "config": "{\"bucket\": \"必须，腾讯云bucket\", \"region\": \"必须，腾讯云cos的区域\", \"accessKeyId\": \"必须，腾讯云accessKeyId\", \"publicDomain\": \"必须，腾讯云oss的公共域名\", \"accessKeySecret\": \"必须，腾讯云accessKeySecret\"}"
     }
   ]
