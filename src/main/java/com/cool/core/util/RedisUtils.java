@@ -112,6 +112,34 @@ public class RedisUtils {
     public static <T> void setCacheObject(final String key, final T value) {
         setCacheObject(key, value, false);
     }
+    
+    /**
+     * 缓存基本的对象，Integer、String、实体类等 并附带 tag 信息
+     *
+     * @param key   缓存的键值
+     * @param value 缓存的值
+     * @param tags 标签信息
+     */
+    public static <T> void setTaggedCacheObject(final String key, final T value, String ... tags) {
+        setCacheObject(key, value, false);
+        
+        for (String tag : tags) {
+            RedisUtils.addCacheSet( tag , key );
+        }
+    }
+
+    /**
+     * 删除所有 附带了 tag 的缓存对象
+     * @param tag tag
+     */
+    public static void cleanTaggedCacheObject( String tag ){
+        Set<Object> cacheSet = RedisUtils.getCacheSet(tag);
+        RedisUtils.deleteObject( cacheSet );
+        RSet<Object> set = CLIENT.getSet(tag);
+        set.delete();
+        set.clear();
+    }
+    
 
     /**
      * 缓存基本的对象，保留当前对象 TTL 有效期
