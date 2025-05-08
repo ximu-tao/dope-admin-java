@@ -137,7 +137,7 @@
       "author": "COOL官方",
       "status": 0,
       "plugin_json": {},
-      "config": "{\"appId\": \"\", \"secretId\": \"\", \"signName\": \"\", \"template\": \"\", \"secretKey\": \"\"}"
+      "config": {"appId": "", "secretId": "", "signName": "", "template": "", "secretKey": ""}
     },
     {
       "name": "微信支付",
@@ -150,7 +150,7 @@
       "author": "COOL官方",
       "status": 0,
       "plugin_json": {},
-      "config": "{\"key\": \"\", \"appid\": \"\", \"mchid\": \"\", \"notify_url\": \"\", \"privateKeyPath\": \"\", \"privateCertPath\": \"\"}"
+      "config": {"key": "", "appid": "", "mchid": "", "notify_url": "", "privateKeyPath": "", "privateCertPath": ""}
     },
     {
       "name": "通用微信SDK",
@@ -163,7 +163,7 @@
       "author": "COOL官方",
       "status": 0,
       "plugin_json": {},
-      "config": "{\"MiniApp\": {\"appid\": \"\", \"secret\": \"\"}, \"OfficialAccount\": {\"appId\": \"公众号的 app key\", \"token\": \"公众号的 token\", \"aesKey\": \"EncodingAESKey\", \"secret\": \"公众号的 app secret\", \"useStableAccessToken\": true}}"
+      "config": {"MiniApp": {"appid": "", "secret": ""}, "OfficialAccount": {"appId": "公众号的 app key", "token": "公众号的 token", "aesKey": "EncodingAESKey", "secret": "公众号的 app secret", "useStableAccessToken": true}}
     },
     {
       "name": "支付宝支付",
@@ -176,7 +176,7 @@
       "author": "XimuTao",
       "status": 0,
       "plugin_json": {},
-      "config": "{\"log\": \"\", \"pid\": \"\", \"mode\": \"normal\", \"app_id\": \"\", \"scanpay\": \"\", \"signtype\": \"cert\", \"notify_url\": \"/\", \"return_url\": \"/\", \"server_url\": \"https://openapi.alipay.com/gateway.do\", \"private_key\": \"\", \"ali_public_key\": \"\", \"alipay_root_cert\": \"\", \"app_cert_public_key\": \"\"}"
+      "config": {"log": "", "pid": "", "mode": "normal", "app_id": "", "scanpay": "", "signtype": "cert", "notify_url": "/", "return_url": "/", "server_url": "https://openapi.alipay.com/gateway.do", "private_key": "", "ali_public_key": "", "alipay_root_cert": "", "app_cert_public_key": ""}
     },
     {
       "name": "腾讯云cos",
@@ -189,7 +189,7 @@
       "author": "COOL官方",
       "status": 0,
       "plugin_json": {},
-      "config": "{\"bucket\": \"必须，腾讯云bucket\", \"region\": \"必须，腾讯云cos的区域\", \"accessKeyId\": \"必须，腾讯云accessKeyId\", \"publicDomain\": \"必须，腾讯云oss的公共域名\", \"accessKeySecret\": \"必须，腾讯云accessKeySecret\"}"
+      "config": {"bucket": "必须，腾讯云bucket", "region": "必须，腾讯云cos的区域", "accessKeyId": "必须，腾讯云accessKeyId", "publicDomain": "必须，腾讯云oss的公共域名", "accessKeySecret": "必须，腾讯云accessKeySecret"}
     }
   ]
 }
