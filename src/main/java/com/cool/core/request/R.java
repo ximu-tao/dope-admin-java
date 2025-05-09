@@ -1,5 +1,6 @@
 package com.cool.core.request;
 
+import com.cool.core.util.I18nUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -34,9 +35,9 @@ public class R<T>  implements Serializable {
     }    
     
     public R( int code, String message, T data ) {
-        this.code = code;
-        this.message = message;
-        this.data = data;
+        this.setCode(code);
+        this.setMessage(message);
+        this.setData(data);
     }
 
     public static R error() {
@@ -49,15 +50,19 @@ public class R<T>  implements Serializable {
 
     public static R error(int code, String msg) {
         R r = new R();
-        r.code = code;
-        r.message = msg;
+        r.setCode(code);
+        r.setMessage(msg);
         return r;
     }
 
     public static R okMsg(String msg) {
         R r = new R();
-        r.message = msg;
+        r.setMessage(msg);
         return r;
+    }
+
+    public void setMessage(String msg) {
+        this.message = I18nUtil.getI18nMsg(msg);
     }
 
     public static R ok() {
@@ -75,11 +80,11 @@ public class R<T>  implements Serializable {
 
     public R<T> put(String key, Object value) {
         if ( key.equals( "code") ) {
-            this.code = (int)value;
+            this.setCode( Integer.parseInt( value.toString() ) );
         } else if ( key.equals( "message") ) {
-            this.message = (String)value;
+            this.setMessage( value.toString() );
         } else if ( key.equals( "data") ) {
-            this.data = (T) value;
+            this.setData( (T) value );
         } else {
             dataMap.put(key, value);
         }

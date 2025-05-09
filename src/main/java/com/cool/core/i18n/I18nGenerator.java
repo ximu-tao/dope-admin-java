@@ -16,6 +16,7 @@ import com.cool.modules.dict.entity.DictInfoEntity;
 import com.cool.modules.dict.entity.DictTypeEntity;
 import com.cool.modules.dict.service.DictInfoService;
 import com.cool.modules.dict.service.DictTypeService;
+import com.cool.plugin.I18nService;
 import com.mybatisflex.core.query.QueryWrapper;
 import java.io.File;
 import java.io.IOException;
@@ -184,7 +185,7 @@ public class I18nGenerator {
     }
 
     private JSONObject invokeTranslate(Map<String, String> map, String language) {
-        return (JSONObject) CoolPluginInvokers.invoke("i18n", "invokeTranslate", map, language);
+        return new I18nService().invokeTranslate( map, language);
     }
 
     // 匹配 CoolPreconditions 抛异常语句中的中文字符串

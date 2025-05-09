@@ -28,9 +28,11 @@ public class I18nUtil {
     public static String getLanguage() {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
         if (attributes == null) {
-            return null;
+            return "zh-cn";
         }
-        return (String) attributes.getAttribute("cool-language", RequestAttributes.SCOPE_REQUEST);
+
+        String language = (String) attributes.getAttribute("cool-language", RequestAttributes.SCOPE_REQUEST);
+        return language != null ? language : "zh-cn";
     }
 
     private static final Map<String, JSONObject> data = new ConcurrentHashMap<>();
