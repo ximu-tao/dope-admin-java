@@ -183,6 +183,19 @@
       "status": 0,
       "plugin_json": "{\"key\": \"upload-cos\", \"hook\": \"upload\", \"logo\": \"assets/logo.png\", \"name\": \"腾讯云cos\", \"author\": \"COOL官方\", \"config\": {\"bucket\": \"必须，腾讯云bucket\", \"region\": \"必须，腾讯云cos的区域\", \"accessKeyId\": \"必须，腾讯云accessKeyId\", \"publicDomain\": \"必须，腾讯云oss的公共域名\", \"accessKeySecret\": \"必须，腾讯云accessKeySecret\"}, \"readme\": \"assets/README.md\", \"jarPath\": \"\", \"version\": \"1.0.0\", \"description\": \"腾讯云文件上传，替换系统的文件上传为cos方式\"}",
       "config": "{\"bucket\": \"必须，腾讯云bucket\", \"region\": \"必须，腾讯云cos的区域\", \"accessKeyId\": \"必须，腾讯云accessKeyId\", \"publicDomain\": \"必须，腾讯云oss的公共域名\", \"accessKeySecret\": \"必须，腾讯云accessKeySecret\"}"
+    },
+    {
+      "name": "国际化多语言",
+      "description": "国际化多语言",
+      "key": "i18n",
+      "hook": "upload",
+      "readme": "略",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "如影",
+      "status": 0,
+      "plugin_json": {"key": "i18n", "hook": "", "logo": "assets/logo.png", "name": "国际化多语言", "author": "如影", "config": {"path": "assets/i18n", "languages": ["zh-cn", "zh-tw", "en"]}, "readme": "assets/README.md", "jarPath": "", "version": "1.0.0", "description": "国际化多语言"},
+      "config": {}
     }
   ]
 }
