@@ -10,6 +10,7 @@ import com.cool.modules.user.controller.app.params.CaptchaParam;
 import com.cool.modules.user.controller.app.params.LoginParam;
 import com.cool.modules.user.controller.app.params.RefreshTokenParam;
 import com.cool.modules.user.controller.app.params.SmsCodeParam;
+import com.cool.modules.user.controller.app.response.LoginResponse;
 import com.cool.modules.user.service.UserLoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +35,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "小程序登录")
     @PostMapping("/mini")
-    public R mini(@RequestBody LoginParam param) {
+    public R<LoginResponse> mini(@RequestBody LoginParam param) {
         String code = param.getCode();
         String encryptedData = param.getEncryptedData();
         String iv = param.getIv();
@@ -50,7 +51,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "公众号登录")
     @PostMapping("/mp")
-    public R mp(@RequestBody LoginParam param) {
+    public R<LoginResponse> mp(@RequestBody LoginParam param) {
         String code = param.getCode();
         CoolPreconditions.checkEmpty(code);
         return R.ok(userLoginService.mp(code));
@@ -62,7 +63,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "微信APP授权登录")
     @PostMapping("/wxApp")
-    public R wxApp(@RequestBody LoginParam param) {
+    public R<LoginResponse> wxApp(@RequestBody LoginParam param) {
         String code = param.getCode();
         CoolPreconditions.checkEmpty(code);
         return R.ok(userLoginService.wxApp(code));
@@ -74,7 +75,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "手机号登录")
     @PostMapping("/phone")
-    public R phone(
+    public R<LoginResponse> phone(
         @RequestBody LoginParam param) {
         String phone = param.getPhone();
         String smsCode = param.getSmsCode();
@@ -89,7 +90,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "一键手机号登录")
     @PostMapping("/uniPhone")
-    public R uniPhone(
+    public R<LoginResponse> uniPhone(
         @RequestBody LoginParam param) {
         String accessToken = param.getAccess_token();
         String openid = param.getOpenid();
@@ -106,7 +107,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "绑定小程序手机号")
     @PostMapping("/miniPhone")
-    public R miniPhone(@RequestBody LoginParam param) {
+    public R<LoginResponse> miniPhone(@RequestBody LoginParam param) {
         String code = param.getCode();
         String encryptedData = param.getEncryptedData();
         String iv = param.getIv();
@@ -160,7 +161,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "刷新token")
     @PostMapping("/refreshToken")
-    public R refreshToken(@RequestBody RefreshTokenParam param) {
+    public R<LoginResponse> refreshToken(@RequestBody RefreshTokenParam param) {
         return R.ok(userLoginService.refreshToken(param.getRefreshToken()));
     }
 
@@ -170,7 +171,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "账号密码登录")
     @PostMapping("/password")
-    public R password(
+    public R<LoginResponse> password(
         @RequestBody LoginParam param) {
         
         String phoneOrUsername = param.getAccount()!=null ? param.getAccount():
@@ -188,7 +189,7 @@ public class AppUserLoginController {
     @TokenIgnore
     @Operation(summary = "用户名、密码注册")
     @PostMapping("/register")
-    public R register(
+    public R<LoginResponse> register(
         @RequestBody LoginParam param) {
         String username = param.getUsername();
         String password = param.getPassword();

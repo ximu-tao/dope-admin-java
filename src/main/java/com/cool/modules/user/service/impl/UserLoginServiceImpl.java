@@ -13,6 +13,7 @@ import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.security.jwt.JwtTokenUtil;
 import com.cool.core.security.jwt.JwtUser;
 import com.cool.modules.base.service.sys.BaseSysLoginService;
+import com.cool.modules.user.controller.app.response.LoginResponse;
 import com.cool.modules.user.entity.UserInfoEntity;
 import com.cool.modules.user.entity.UserOauthEntity;
 import com.cool.modules.user.proxy.WxProxy;
@@ -61,7 +62,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public Object phoneVerifyCode(String phone, String smsCode) {
+    public LoginResponse phoneVerifyCode(String phone, String smsCode) {
         // 校验短信验证码，不通过直接抛异常
         userSmsUtil.checkVerifyCode(phone, smsCode, SendSceneEnum.ALL);
         return generateTokenByPhone(phone);
@@ -69,7 +70,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
 
     @Override
-    public Object refreshToken(String refreshToken) {
+    public LoginResponse refreshToken(String refreshToken) {
         CoolPreconditions.check(!jwtTokenUtil.validateRefreshToken(refreshToken), "错误的refreshToken");
         JWT jwt = jwtTokenUtil.getTokenInfo(refreshToken);
         CoolPreconditions.check(jwt == null || !(Boolean) jwt.getPayload("isRefresh"),
@@ -79,12 +80,12 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public Object mini(String code, String encryptedData, String iv) {
+    public LoginResponse mini(String code, String encryptedData, String iv) {
         UserOauthEntity userOauthEntity = userOauthService.loginByMini(code, encryptedData, iv);
         return wxLoginToken( userOauthEntity );
     }
 
-    private Object wxLoginToken(UserOauthEntity userOauthEntityBywx ) {
+    private LoginResponse wxLoginToken(UserOauthEntity userOauthEntityBywx ) {
         Long userId = ObjUtil.isNotEmpty(userOauthEntityBywx.getUserId()) ? userOauthEntityBywx.getUserId()
             : 0L;
         UserInfoEntity userInfoEntity = userInfoService.getById(userId);
@@ -105,22 +106,22 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public Object mp(String code) {
+    public LoginResponse mp(String code) {
         return null;
     }
 
     @Override
-    public Object wxApp(String code) {
+    public LoginResponse wxApp(String code) {
         return null;
     }
 
     @Override
-    public Object uniPhone(String accessToken, String openid, String appId) {
+    public LoginResponse uniPhone(String accessToken, String openid, String appId) {
         return null;
     }
 
     @Override
-    public Object miniPhone(String code, String encryptedData, String iv) {
+    public LoginResponse miniPhone(String code, String encryptedData, String iv) {
         try {
             WxMaPhoneNumberInfo phoneNumber = wxProxy.getPhoneNumber(code);
             CoolPreconditions.checkEmpty(phoneNumber, "微信登录失败");
@@ -133,7 +134,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public Object password(String phoneOrUsername, String password) {
+    public LoginResponse password(String phoneOrUsername, String password) {
         UserInfoEntity userInfoEntity = userInfoService.getOne(
             QueryWrapper.create().eq(UserInfoEntity::getPhone, phoneOrUsername));
         
@@ -151,7 +152,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
     
     @Override
-    public Object register(String username, String password) {
+    public LoginResponse register(String username, String password) {
         
         try {
             
@@ -173,7 +174,7 @@ public class UserLoginServiceImpl implements UserLoginService {
      * 前置已校验用户的手机号，
      * 根据手机号找到用户生成token
      */
-    private Object generateTokenByPhone(String phone) {
+    private LoginResponse generateTokenByPhone(String phone) {
         UserInfoEntity userInfoEntity = userInfoService.getOne(
             QueryWrapper.create().eq(UserInfoEntity::getPhone, phone));
         if (ObjUtil.isEmpty(userInfoEntity)) {
@@ -199,11 +200,11 @@ public class UserLoginServiceImpl implements UserLoginService {
     /**
      * 生成token
      */
-    private Dict generateToken(Long userId, String refreshToken) {
+    private LoginResponse generateToken(Long userId, String refreshToken) {
         UserInfoEntity userInfoEntity = userInfoService.getById(userId);
         return generateToken(userInfoEntity, refreshToken);
     }
-    private Dict generateToken(UserInfoEntity userInfoEntity, String refreshToken) {
+    private LoginResponse generateToken(UserInfoEntity userInfoEntity, String refreshToken) {
         
         CoolPreconditions.check( userInfoEntity.getBlock() , 403, "您已被拉黑");
         
@@ -218,10 +219,11 @@ public class UserLoginServiceImpl implements UserLoginService {
             authority,
             ObjUtil.equals(userInfoEntity.getStatus(), 1));
         coolCache.set("app:userDetails:" + jwtUser.getUserId(), jwtUser);
-        return Dict.create()
-            .set("token", token)
-            .set("expire", jwtTokenUtil.getExpire())
-            .set("refreshToken", refreshToken)
-            .set("refreshExpire", jwtTokenUtil.getRefreshExpire());
+        return LoginResponse.builder()
+            .token(token)
+            .expire( jwtTokenUtil.getExpire() )
+            .refreshToken(refreshToken)
+            .refreshExpire( jwtTokenUtil.getRefreshExpire() )
+            .build();
     }
 }
