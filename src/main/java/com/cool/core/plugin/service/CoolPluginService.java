@@ -60,27 +60,27 @@ public class CoolPluginService {
             log.info("没有可初始化的插件");
             return;
         }
-//        list.forEach(this::initInstall);
+        list.forEach(this::initInstall);
     }
 
     /**
      * 系统启动初始化安装插件
      */
     private void initInstall(PluginInfoEntity entity) {
-        PluginJson pluginJson = entity.getPluginJson();
-        File file = new File(pluginJson.getJarPath());
-        // 检查文件是否存在
-        if (!file.exists()) {
-            log.warn("插件文件不存在，请重新安装!");
-            return;
-        }
-        file = new File(pluginJson.getJarPath());
-        if (file.exists()) {
+//        PluginJson pluginJson = entity.getPluginJson();
+//        File file = new File(pluginJson.getJarPath());
+//        // 检查文件是否存在
+//        if (!file.exists()) {
+//            log.warn("插件文件不存在，请重新安装!");
+//            return;
+//        }
+//        file = new File(pluginJson.getJarPath());
+        if ( true ) {
             ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
             try {
-                dynamicJarLoaderService.install(pluginJson.getJarPath(), true);
-                // 设置配置
-                CoolPluginInvokers.setPluginJson(entity.getKey(), entity);
+//                dynamicJarLoaderService.install(pluginJson.getJarPath(), true);
+//                // 设置配置
+//                CoolPluginInvokers.setPluginJson(entity.getKey(), entity);
                 pluginEventPublisher.publish(entity.getKey(), PluginActionEnum.INSTALL, entity);
             } catch (Exception e) {
                 log.error("初始化{}插件失败", entity.getName(), e);
