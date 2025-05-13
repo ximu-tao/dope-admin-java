@@ -30,6 +30,12 @@
 
     <dependencies>
         
+        <dependency>
+            <groupId>me.zhyd.oauth</groupId>
+            <artifactId>JustAuth</artifactId>
+            <version>1.16.7</version>
+        </dependency>
+        
         
         <!-- https://mvnrepository.com/artifact/com.tencent.cloud/cos-sts-java -->
         <dependency>
