@@ -203,6 +203,165 @@
       "status": 0,
       "plugin_json": {"key": "i18n", "hook": "", "logo": "assets/logo.png", "name": "国际化多语言", "author": "如影", "config": {"path": "assets/i18n", "languages": ["zh-cn", "zh-tw", "en"]}, "readme": "assets/README.md", "jarPath": "", "version": "1.0.0", "description": "国际化多语言"},
       "config": {}
+    },
+    {
+      "name": "第三方登录集成",
+      "description": "第三方登录集成",
+      "key": "oauth",
+      "hook": "",
+      "readme": "注意在第三方授权网站填写授权回调uri： 协议 + 回调域名 + '/app/user/oauth/callback/{source}  \n代理模式：平台下增加httpConfig参数，参考google： type: 0-直连（默认）,1-HTTP代理，2-SOCKS代理",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "XimuTao",
+      "status": 0,
+      "plugin_json": {},
+      "config": {
+        "redirect_domain": "协议 + 回调域名，如 'https://localhost' 不需要路径部分。",
+        "dingtalk": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "baidu": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "github": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "gitee": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "weibo": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "coding": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "oschina": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "alipay": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "qq": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "wechat_open": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "csdn": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "google": {
+          "clientId": "",
+          "clientSecret": "",
+          "httpConfig": {
+            "timeout": 1500,
+            "proxy": {
+              "type": 1,
+              "hostname": "127.0.0.1",
+              "port": 10080
+            }
+          }
+        },
+        "facebook": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "douyin": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "linkedin": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "microsoft": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "mi": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "toutiao": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "teambition": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "pinterest": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "renren": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "stack_overflow": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "huawei": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "wechat_enterprise": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "kujiale": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "gitlab": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "meituan": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "eleme": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "mygitlab": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "twitter": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "wechat_mp": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "aliyun": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "xmly": {
+          "clientId": "",
+          "clientSecret": ""
+        },
+        "feishu": {
+          "clientId": "",
+          "clientSecret": ""
+        }
+      }
     }
   ]
 }
