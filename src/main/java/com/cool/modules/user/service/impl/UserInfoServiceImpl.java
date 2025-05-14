@@ -2,6 +2,7 @@ package com.cool.modules.user.service.impl;
 
 import cn.hutool.crypto.digest.MD5;
 import com.cool.core.base.BaseServiceImpl;
+import com.cool.core.event.EventPublisher;
 import com.cool.core.util.RedisUtils;
 import com.cool.modules.user.entity.UserInfoEntity;
 import com.cool.modules.user.mapper.UserInfoMapper;
@@ -17,6 +18,21 @@ public class UserInfoServiceImpl extends BaseServiceImpl<UserInfoMapper, UserInf
     UserInfoService {
 
     private final UserSmsUtil userSmsUtil;
+    private final EventPublisher eventPublisher;
+
+    @Override
+    public Long add(UserInfoEntity entity) {
+        Long add = super.add(entity);
+        eventPublisher.publish("user.register" , entity );
+        return add;
+    }
+
+    @Override
+    public boolean update(UserInfoEntity entity) {
+        boolean update = super.update(entity);
+        eventPublisher.publish("user.update" , entity );
+        return update;
+    }
 
     @Override
     public UserInfoEntity person(Long userId) {
@@ -41,7 +57,7 @@ public class UserInfoServiceImpl extends BaseServiceImpl<UserInfoMapper, UserInf
         info.setNickName("已注销-00" + userId);
         info.updateById();
 
-        RedisUtils.publish("user-logoff" , userId );
+        eventPublisher.publish("user-delete" , userId );
         
     }
 

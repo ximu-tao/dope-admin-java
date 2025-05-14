@@ -9,6 +9,7 @@ import cn.hutool.crypto.digest.MD5;
 import cn.hutool.jwt.JWT;
 import com.cool.core.cache.CoolCache;
 import com.cool.core.enums.UserTypeEnum;
+import com.cool.core.event.EventPublisher;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.security.jwt.JwtTokenUtil;
 import com.cool.core.security.jwt.JwtUser;
@@ -52,6 +53,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     private final WxProxy wxProxy;
     private final static List<GrantedAuthority> authority =
       List.of(new SimpleGrantedAuthority("ROLE_" + UserTypeEnum.APP.name()));
+    private final EventPublisher eventPublisher;
 
     @Override
     public void smsCode(String phone, String captchaId, String code) {
@@ -97,7 +99,7 @@ public class UserLoginServiceImpl implements UserLoginService {
             userInfoEntity.setGender(  Integer.parseInt( extend.getOrDefault( "gender" , 0 ).toString() ) );
             userInfoEntity.setAvatarUrl(  extend.getOrDefault( "avatar_url" ,null ).toString() );
             
-            userInfoEntity.save();
+            userInfoService.add(userInfoEntity);
             userOauthEntityBywx.setUserId( userInfoEntity.getId() );
 
             userOauthEntityBywx.updateById();
@@ -162,7 +164,7 @@ public class UserLoginServiceImpl implements UserLoginService {
             userInfoEntity.setStatus( 1 );
             userInfoEntity.setBlock(false);
             userInfoEntity.setNickName( "新用户" + RandomUtil.randomString(4) );
-            userInfoEntity.save();
+            userInfoService.add(userInfoEntity);
             return generateToken( userInfoEntity , null );
         } catch ( PersistenceException e ) {
             CoolPreconditions.alwaysThrow( "用户名已被注册" );
@@ -182,7 +184,7 @@ public class UserLoginServiceImpl implements UserLoginService {
             userInfoEntity.setPhone(phone);
             // 生成随机昵称
             userInfoEntity.setNickName(generateRandomNickname());
-            userInfoEntity.save();
+            userInfoService.add(userInfoEntity);
         }
         return generateToken(userInfoEntity, null);
     }
@@ -219,6 +221,9 @@ public class UserLoginServiceImpl implements UserLoginService {
             authority,
             ObjUtil.equals(userInfoEntity.getStatus(), 1));
         coolCache.set("app:userDetails:" + jwtUser.getUserId(), jwtUser);
+        
+        eventPublisher.publish("user.login" , userInfoEntity );
+        
         return LoginResponse.builder()
             .token(token)
             .expire( jwtTokenUtil.getExpire() )

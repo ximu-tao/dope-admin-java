@@ -43,7 +43,7 @@ public class AppUserInfoController {
         infoEntity.setStatus(null);
         
         return R.ok(
-            userInfoService.updateById(infoEntity)
+            userInfoService.update(infoEntity)
         );
     }
     
