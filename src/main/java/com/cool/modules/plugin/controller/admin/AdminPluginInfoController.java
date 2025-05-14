@@ -51,8 +51,6 @@ public class AdminPluginInfoController extends AdminController<PluginInfoService
         @RequestAttribute() JSONObject requestParams) {
         if (ObjUtil.isNotEmpty(t.getConfig())) {
             t.setConfig(JSONUtil.parseObj(t.getConfig()));
-        } else {
-            t.setConfig(new HashMap<>());
         }
         coolPluginService.updatePlugin(t);
         return R.ok();
