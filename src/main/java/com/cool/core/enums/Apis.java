@@ -6,6 +6,7 @@ public class Apis {
     public static final String UPDATE = "update";
     public static final String PAGE = "page";
     public static final String LIST = "list";
+    public static final String LISTS = "lists";
     public static final String INFO = "info";
     public static final String MY_LIST = "myList";
     public static final String MY_INFO = "myInfo";
