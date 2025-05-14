@@ -12,5 +12,5 @@ public class Apis {
     public static final String MY_INFO = "myInfo";
     
     
-    public static final String[] ALL_API = new String[]{ ADD, DELETE, UPDATE, PAGE, LIST, INFO , MY_LIST, MY_INFO};
+    public static final String[] ALL_API = new String[]{ ADD, DELETE, UPDATE, PAGE, LIST, INFO , MY_LIST, MY_INFO, LISTS};
 }
