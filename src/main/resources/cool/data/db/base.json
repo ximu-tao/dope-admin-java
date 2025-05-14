@@ -203,6 +203,27 @@
       "status": 0,
       "plugin_json": {"key": "i18n", "hook": "", "logo": "assets/logo.png", "name": "国际化多语言", "author": "如影", "config": {"path": "assets/i18n", "languages": ["zh-cn", "zh-tw", "en"]}, "readme": "assets/README.md", "jarPath": "", "version": "1.0.0", "description": "国际化多语言"},
       "config": {}
+    },
+    {
+      "name": "支付",
+      "description": "",
+      "key": "pay",
+      "hook": "pay",
+      "readme": "略",
+      "version": "1.0.0",
+      "logo": "",
+      "author": "XimuTao",
+      "status": 0,
+      "plugin_json": {},
+      "config": {
+        "PayPal": {
+          "clientId": "应用编号",
+          "secret": "应用密钥",
+          "sandBox": false,
+          "domain": "回调域名"
+        },
+        "TODO": "TODO"
+      }
     }
   ]
 }

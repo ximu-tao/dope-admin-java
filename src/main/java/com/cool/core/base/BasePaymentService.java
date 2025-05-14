@@ -5,7 +5,7 @@ import com.cool.core.pay.PayableEntity;
 
 public interface BasePaymentService {
     
-    Object create(PayableEntity entity, Long payerId, String notifyUrl ) throws Exception;
+    Object create(PayableEntity entity, Long payerId, String notifyUrl , String returnUrl) throws Exception;
     
     
     /**
