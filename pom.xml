@@ -36,6 +36,12 @@
             <version>1.16.7</version>
         </dependency>
         
+
+        <dependency>
+            <groupId>com.github.javen205</groupId>
+            <artifactId>IJPay-All</artifactId>
+            <version>2.9.12.1-17</version>
+        </dependency>
         
         <!-- https://mvnrepository.com/artifact/com.tencent.cloud/cos-sts-java -->
         <dependency>

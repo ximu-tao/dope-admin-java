@@ -106,7 +106,7 @@ public class WxPayService extends WxPayServiceImpl implements BasePaymentService
 
 
     @Override
-    public WxPayMpOrderResult create(PayableEntity entity, Long payerId, String notifyUrl) throws WxPayException {
+    public WxPayMpOrderResult create(PayableEntity entity, Long payerId, String notifyUrl, String returnUrl) throws WxPayException {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody( entity.getBody() );
         orderRequest.setOutTradeNo( entity.getOutTradeNo() );

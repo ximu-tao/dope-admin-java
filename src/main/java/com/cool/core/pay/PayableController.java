@@ -176,7 +176,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
                     yield R.error(500, "微信支付未启用");
                 }
 
-                WxPayMpOrderResult orderByMini = wxPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() );
+                WxPayMpOrderResult orderByMini = wxPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() , "");
 
                 yield R.ok(orderByMini);
             }
@@ -189,7 +189,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
 
                     notifyUrl.append("/wxNotify");
                     
-                    WxPayMpOrderResult orderByApp = wxPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() );
+                    WxPayMpOrderResult orderByApp = wxPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() , "");
                     yield R.ok(orderByApp);
 
                 }
@@ -201,7 +201,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
                     notifyUrl.append("/aliNotify");
                     try {
                         
-                        String orderByAliApp = aliPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() );
+                        String orderByAliApp = aliPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() , "");
 
                         yield R.ok(orderByAliApp);
                     } catch (AlipayApiException e) {

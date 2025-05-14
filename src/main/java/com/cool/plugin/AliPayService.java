@@ -101,7 +101,7 @@ public class AliPayService implements BasePaymentService {
     }
     
     @Override
-    public String create( PayableEntity entity, Long payerId, String notifyUrl ) throws AlipayApiException {
+    public String create( PayableEntity entity, Long payerId, String notifyUrl , String returnUrl) throws AlipayApiException {
                 // 构造请求参数以调用接口
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
