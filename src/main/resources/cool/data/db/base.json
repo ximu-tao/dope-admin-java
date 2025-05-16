@@ -195,7 +195,7 @@
       "name": "国际化多语言",
       "description": "国际化多语言",
       "key": "i18n",
-      "hook": "upload",
+      "hook": "",
       "readme": "略",
       "version": "1.0.0",
       "logo": "",
