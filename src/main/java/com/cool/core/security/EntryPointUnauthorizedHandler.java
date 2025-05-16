@@ -1,6 +1,7 @@
 package com.cool.core.security;
 
 import cn.hutool.json.JSONUtil;
+import com.cool.core.request.R;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -22,12 +23,7 @@ public class EntryPointUnauthorizedHandler implements AuthenticationEntryPoint {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
-        response.getWriter().write(JSONUtil.toJsonStr(new HashMap<String, Object>() {
-            {
-                put("code", "401");
-                put("message", "未登录");
-            }
-        }));
+        response.getWriter().write(JSONUtil.toJsonStr(R.error(401 ,"未登录" )));
         response.setStatus(401);
     }
 
