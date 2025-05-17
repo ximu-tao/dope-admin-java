@@ -3,11 +3,14 @@ package com.cool.core.base;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONObject;
 import com.cool.core.annotation.EpsField;
 import com.cool.core.annotation.QuickQueryField;
 import com.cool.core.annotation.ListSelectField;
+import com.cool.core.event.EventPublisher;
 import com.cool.core.request.PageParams;
+import com.cool.core.util.ConvertUtil;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryColumn;
@@ -290,10 +293,31 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
         }).toList();
     }
     
+    
+    
+    
+    
+    
+    private static final EventPublisher eventPublisher = SpringUtil.getBean(EventPublisher.class);
+    
+    private String baseTriggerName;
+    
+    protected String getBaseTriggerName() {
+        if (baseTriggerName == null) {
+            String className = this.getClass().getSimpleName();
+            baseTriggerName = ConvertUtil.extractPath("app", className, "ServiceImpl");
+        }
+        return baseTriggerName;
+    }
+    
+    
+    
+    
 
     @Override
     public Long add(T entity) {
         mapper.insertSelective(entity);
+        eventPublisher.publish( getBaseTriggerName()+"/add", entity );
         return entity.getId();
     }
 
@@ -317,7 +341,9 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     @Override
     public boolean delete(Long... ids) {
-        return mapper.deleteBatchByIds(Arrays.asList(ids)) > 0;
+        boolean b = mapper.deleteBatchByIds(Arrays.asList(ids)) > 0;
+        Arrays.asList(ids).forEach(id -> eventPublisher.publish( getBaseTriggerName()+"/add", id ));
+        return b;
     }
 
     @Override
@@ -335,7 +361,9 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
     @Override
     public boolean update(T entity) {
-        return mapper.update(entity) > 0;
+        boolean b = mapper.update(entity) > 0;
+        eventPublisher.publish( getBaseTriggerName()+"/update", entity );
+        return b;
     }
 
     @Override
