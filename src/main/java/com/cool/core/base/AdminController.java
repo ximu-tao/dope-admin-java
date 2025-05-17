@@ -23,7 +23,7 @@ import java.util.*;
 public abstract class AdminController <S extends BaseService<T>, T extends BaseEntity<T>> extends BaseController<S,T> {
     
     
-    /**
+/**
      * 新增
      * <p>
      * // * @param t 实体对象
@@ -35,7 +35,7 @@ public abstract class AdminController <S extends BaseService<T>, T extends BaseE
         if (JSONUtil.isTypeJSONArray(body)) {
             JSONArray array = JSONUtil.parseArray(body);
             return R.ok(Dict.create()
-                .set("ids", service.addBatch(requestParams, array.toList(currentEntityClass()))));
+                .set("id", service.addBatch(requestParams, array.toList(currentEntityClass()))));
         } else {
             return R.ok(Dict.create().set("id",
                 service.add(requestParams, requestParams.toBean(currentEntityClass()))));
