@@ -13,6 +13,7 @@ import cn.hutool.json.JSONUtil;
 import com.cool.core.annotation.EpsField;
 import com.cool.core.annotation.EspRemoteSelectField;
 import com.cool.core.base.BaseEntity;
+import com.cool.core.annotation.TokenIgnore;
 import com.cool.core.config.CustomOpenApiResource;
 import com.cool.core.enums.AdminComponentsEnum;
 import com.cool.core.util.ConvertUtil;
@@ -95,10 +96,12 @@ public class CoolEps {
     private void urls() {
         Dict admin = Dict.create();
         Dict app = Dict.create();
+        ArrayList<Object> emptyList = new ArrayList<>();
         Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
         for (Map.Entry<RequestMappingInfo, HandlerMethod> methodEntry : map.entrySet()) {
             RequestMappingInfo info = methodEntry.getKey();
             HandlerMethod method = methodEntry.getValue();
+            TokenIgnore tokenIgnore = method.getMethodAnnotation(TokenIgnore.class);
             String module = getModule(method);
             if (StrUtil.isNotEmpty(module)) {
                 String entityName = getEntity(method.getBeanType());
@@ -131,17 +134,24 @@ public class CoolEps {
                     }
                 });
                 if (item != null) {
-                    item.set("api", apis(prefix, methodPath, item.getBean("api")));
+                    item.set("api", apis(prefix, methodPath, item.getBean("api"), tokenIgnore));
                 } else {
                     item = Dict.create();
                     item.set("controller", method.getBeanType().getSimpleName());
                     item.set("module", module);
+                    item.set("info", Dict.create().set("type",
+                            Dict.create()
+                                    .set("name", getLastPathSegment(prefix))
+                                    .set("description", "")
+                    ));
+                    item.set("api", apis(prefix, methodPath, item.getBean("api"), tokenIgnore));
                     item.set("name", entityName);
-                    item.set("api", new ArrayList<Dict>());
-                    item.set("prefix", prefix);
                     item.set("columns", entityInfo.get(entityName));
-                    item.set("menu", menuInfo.get( entityName ) );
-                    item.set("api", apis(prefix, methodPath, item.getBean("api")));
+                    item.set("pageQueryOp", Dict.create().set("keyWordLikeFields", emptyList)
+                                                         .set("fieldEq", emptyList)
+                                                         .set("fieldLike", emptyList));
+                    item.set("prefix", prefix);
+                    item.set("menu", menuInfo.get(entityName));
                     urls.add(item);
                 }
                 if (type == 0) {
@@ -157,6 +167,28 @@ public class CoolEps {
         this.app = app;
 
     }
+    /**
+     * 提取URL路径中的最后一个路径段
+     * 示例：输入 "/api/getData" 返回 "getData"
+     */
+    private String getLastPathSegment(String url) {
+        if (StrUtil.isBlank(url)) {
+            return "";
+        }
+
+        int queryIndex = url.indexOf('?');
+        if (queryIndex != -1) {
+            url = url.substring(0, queryIndex);
+        }
+
+        int slashIndex = url.lastIndexOf('/');
+        if (slashIndex != -1 && slashIndex < url.length() - 1) {
+            return url.substring(slashIndex + 1);
+        } else {
+            return url;
+        }
+    }
+
 
     /**
      * 设置所有的api
@@ -166,13 +198,18 @@ public class CoolEps {
      * @param list       api列表
      * @return api列表
      */
-    private List<Dict> apis(String prefix, String methodPath, List<Dict> list) {
+    private List<Dict> apis(String prefix, String methodPath, List<Dict> list, TokenIgnore tokenIgnore) {
+        if (ObjUtil.isNull(list)) {
+            list =  new ArrayList<>();
+        }
         Dict item = Dict.create();
-        item.set("method", "");
         item.set("path", methodPath);
-        item.set("summary", "");
         item.set("tag", "");
-        item.set("dts", new Object());
+        item.set("dts", Dict.create());
+        item.set("ignoreToken", false);
+        if (tokenIgnore != null) {
+            item.set("ignoreToken", true);
+        }
         setSwaggerInfo(item, prefix + methodPath);
         list.add(item);
         return list;
@@ -403,6 +440,7 @@ public class CoolEps {
                 dict.set("field", remoteSelectField.titleField() );
             }
             
+            dict.set("source", "a." + field.getName());
             dictList.add(dict);
 
 //            fieldsInfo.put(field.getName(), dict);

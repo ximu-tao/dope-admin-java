@@ -1,5 +1,7 @@
 package com.cool.core.annotation;
 
+import com.cool.core.enums.AdminComponentsEnum;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,7 +15,7 @@ public @interface EpsField {
      * 管理端生成的组件类型
      * @return
      */
-    String component() default "input";
+    String component() default AdminComponentsEnum.INPUT;
 
     /**
      * 排除 EQ 查询条件

@@ -10,6 +10,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.cool.core.enums.QueryModeEnum;
+import com.cool.core.util.ConvertUtil;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.query.QueryCondition;
@@ -97,7 +98,7 @@ public class CrudOption<T> {
     public CrudOption<T> queryModeEnum(QueryModeEnum queryModeEnum) {
         this.queryModeEnum = queryModeEnum;
         if (ObjUtil.equal(queryModeEnum, QueryModeEnum.CUSTOM)
-            && ObjUtil.isEmpty(asType)) {
+                && ObjUtil.isEmpty(asType)) {
             asType = Map.class;
         }
         return this;
@@ -127,32 +128,46 @@ public class CrudOption<T> {
     private QueryWrapper build(QueryWrapper queryWrapper, Class<T> entityClass) {
         if (ObjectUtil.isNotEmpty(fieldEq)) {
             Arrays.stream(fieldEq).toList().forEach(filed -> {
-                Object obj = requestParams.get(StrUtil.toCamelCase(filed.getName()));
+                String filedName = StrUtil.toCamelCase(filed.getName());
+                Object obj = requestParams.get(filedName);
                 if (ObjUtil.isEmpty(obj)) {
                     return;
                 }
                 if (obj instanceof JSONArray) {
                     // 集合
-                    queryWrapper.and(filed.in(((JSONArray)obj).toArray()));
+                    queryWrapper.and(filed.in(ConvertUtil.covertListByClass(filedName, (JSONArray)obj, entityClass).toArray()));
                 } else {
                     // 对象
-                    queryWrapper.and(filed.eq(obj));
+                    queryWrapper.and(filed.eq(ConvertUtil.convertByClass(filedName, obj, entityClass)));
                 }
             });
         }
-        Object keyWord = requestParams.get("keyWord");
-        if (ObjectUtil.isNotEmpty(this.keyWordLikeFields) && ObjectUtil.isNotEmpty(keyWord)) {
-            // 初始化一个空的 QueryCondition
-            QueryCondition orCondition = null;
-            for (QueryColumn queryColumn : keyWordLikeFields) {
-                QueryCondition condition = queryColumn.like(keyWord);
-                if (orCondition == null) {
-                    orCondition = condition;
-                } else {
-                    orCondition = orCondition.or(condition);
+        if (ObjectUtil.isNotEmpty(this.keyWordLikeFields)) {
+            Object keyWord = requestParams.get("keyWord");
+            if (ObjectUtil.isEmpty(keyWord)) {
+                // // keyWord值为空，遍历keyWordLikeFields字段，根据queryColumn字段名构建查询条件
+                for (QueryColumn queryColumn : keyWordLikeFields) {
+                    String fieldName = queryColumn.getName();
+                    String paramName = StrUtil.toCamelCase(fieldName);
+                    String paramValue = requestParams.getStr(paramName);
+                    if (ObjectUtil.isNotEmpty(paramValue)) {
+                        queryWrapper.and(queryColumn.like(paramValue));
+                    }
                 }
+            } else {
+                // keyWord值非空，使用keyWord构建
+                // 初始化一个空的 QueryCondition
+                QueryCondition orCondition = null;
+                for (QueryColumn queryColumn : keyWordLikeFields) {
+                    QueryCondition condition = queryColumn.like(keyWord);
+                    if (orCondition == null) {
+                        orCondition = condition;
+                    } else {
+                        orCondition = orCondition.or(condition);
+                    }
+                }
+                queryWrapper.and(orCondition);
             }
-            queryWrapper.and(orCondition);
         }
         if (ObjectUtil.isNotEmpty(select)) {
             queryWrapper.select(select);
@@ -176,12 +191,12 @@ public class CrudOption<T> {
             tableAlias = queryTable.getName() + ".";
         }
         String order = requestParams.getStr("order",
-            tableAnnotation.camelToUnderline() ? "create_time" : "createTime");
+                tableAnnotation.camelToUnderline() ? "create_time" : "createTime");
         String sort = requestParams.getStr("sort", "desc");
         if (StrUtil.isNotEmpty(order) && StrUtil.isNotEmpty(sort)) {
             queryWrapper.orderBy(
-                tableAlias + (tableAnnotation.camelToUnderline() ? StrUtil.toUnderlineCase(order) : order),
-                sort.equals("asc"));
+                    tableAlias + (tableAnnotation.camelToUnderline() ? StrUtil.toUnderlineCase(order) : order),
+                    sort.equals("asc"));
         }
     }
 }
