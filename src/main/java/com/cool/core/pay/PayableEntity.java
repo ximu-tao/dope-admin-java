@@ -2,6 +2,7 @@ package com.cool.core.pay;
 
 import com.cool.core.base.BelongingUserEntity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public interface PayableEntity extends BelongingUserEntity {
@@ -64,7 +65,14 @@ public interface PayableEntity extends BelongingUserEntity {
      * 支付总价
      * @return
      */
+    @Deprecated
     public Double getTotal();
+    
+    /**
+     * 支付总价
+     * @return
+     */
+    public BigDecimal getTotalAmount();
     
     
     /**

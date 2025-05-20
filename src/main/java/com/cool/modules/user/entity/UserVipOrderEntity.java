@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 
 @Data
 @Schema( description = "会员开通订单")
@@ -19,7 +21,7 @@ public class UserVipOrderEntity extends BasePayableEntity<UserVipOrderEntity> im
     
     @ColumnDefine(comment = "价格", notNull = true)
     @Schema(hidden = true)
-    protected Double price;
+    protected BigDecimal price;
     
     @ColumnDefine(comment = "商品标题", notNull = true)
     @Schema(hidden = true)
@@ -47,6 +49,11 @@ public class UserVipOrderEntity extends BasePayableEntity<UserVipOrderEntity> im
 
     @Override
     public Double getTotal() {
+        return price.doubleValue();
+    }
+
+    @Override
+    public BigDecimal getTotalAmount() {
         return price;
     }
 }

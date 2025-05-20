@@ -6,13 +6,15 @@ import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Table(value = "user_vip_info" , comment = "会员开通配置")
 @Schema( description = "会员开通配置")
 public class UserVipInfoEntity extends BaseEntity<UserVipInfoEntity> {
     
     @ColumnDefine(comment = "价格", notNull = true)
-    private Double price;
+    private BigDecimal price;
     
     @ColumnDefine(comment = "原价" )
     private Double oldPrice;
