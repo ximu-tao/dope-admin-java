@@ -26,16 +26,16 @@ public class AppUserInfoController {
 
     @Operation(summary = "用户个人信息", description = "获得App、小程序或者其他应用的用户个人信息")
     @GetMapping("/person")
-    public R person() {
+    public R<UserInfoEntity> person() {
         Long userId = CoolSecurityUtil.getCurrentUserId();
         UserInfoEntity userInfoEntity = userInfoService.person(userId);
-        return R.ok(EntityUtils.toMap(userInfoEntity,
-            "password"));
+        userInfoEntity.setPassword(null);
+        return R.ok(userInfoEntity);
     }
 
     @Operation(summary = "更新用户信息")
     @PostMapping("/updatePerson")
-    public R updatePerson(@RequestBody UserInfoEntity infoEntity ) {
+    public R<Boolean> updatePerson(@RequestBody UserInfoEntity infoEntity ) {
         infoEntity.setId(CoolSecurityUtil.getCurrentUserId());
         
         infoEntity.setPassword(null);
