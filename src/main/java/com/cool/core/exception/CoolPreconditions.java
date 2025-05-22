@@ -16,14 +16,14 @@ public class CoolPreconditions {
      * 条件如果为真 就抛异常 如 CoolPreconditions.check(StrUtil.isEmptyIfStr(name), 500,
      * "名称不能为空"); name 字段如果为 null或空字符串，就抛异常
      */
-    public static void check(boolean flag, int code, String message, Object... arguments) {
-        if (flag) {
+    public static void check(Boolean flag, int code, String message, Object... arguments) {
+        if ( flag != null && flag) {
             throw getCoolException(message, code, arguments);
         }
     }
 
-    public static void check(boolean flag, String message, Object... arguments) {
-        if (flag) {
+    public static void check(Boolean flag, String message, Object... arguments) {
+        if ( flag != null && flag) {
             throw getCoolException(message, arguments);
         }
     }
@@ -48,8 +48,8 @@ public class CoolPreconditions {
     /**
      * 返回data
      */
-    public static void returnData(boolean flag, Object data) {
-        if (flag) {
+    public static void returnData(Boolean flag, Object data) {
+        if ( flag != null && flag) {
             throw new CoolException(data);
         }
     }
