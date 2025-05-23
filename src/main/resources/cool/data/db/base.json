@@ -375,12 +375,6 @@
       "status": 0,
       "plugin_json": {},
       "config": {
-        "PayPal": {
-          "clientId": "应用编号",
-          "secret": "应用密钥",
-          "sandBox": false,
-          "domain": "回调域名"
-        },
         "TODO": "TODO"
       }
     }
