@@ -82,7 +82,7 @@ public class AppBaseCommController {
                             }
                         
                             img {
-                                max-width: 100vw;
+                                max-width: 100vmin;
                                 height: auto;
                             }
                         
@@ -97,7 +97,7 @@ public class AppBaseCommController {
                         </style>
                         
                         <body style="width: 100vw;">
-                        <div class="body text" style="line-height: 4vw; font-size: 4vw;">
+                        <div class="body text" style="line-height: 4vmin; font-size: 4vmin;">
                         """
                 + byKey.getData() +
                 """
