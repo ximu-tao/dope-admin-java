@@ -62,12 +62,13 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
 
         
     @Operation(summary = "创建订单", description = "创建订单后使用返回ID值调用同目录 pay 接口")
-    @PostMapping("/add")
-    @Override
-    public R<T> add(@Valid @RequestBody T requestParams, @RequestAttribute() JSONObject jsontParams) {
+    @PostMapping("/create")
+    public R<T> create(@Valid @RequestBody T requestParams) {
         Long userId = CoolSecurityUtil.getCurrentUserId();
         requestParams.setUserId(userId);
-        return super.add(requestParams, jsontParams);
+
+        Long add = service.add(requestParams);
+        return R.ok(requestParams);
     }
 
     
@@ -116,7 +117,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
     @Operation(summary = "支付", description = "支付")
     @PostMapping("/pay")
     @NoRepeatSubmit
-    protected R pay( @Valid @RequestBody PayInfo pay ) throws WxPayException {
+    protected R pay( @Valid @RequestBody PayInfo pay ) throws Exception {
 
         String className = this.getClass().getSimpleName();
         String classPath = ConvertUtil.extractController2Path("app", className);
@@ -166,57 +167,50 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         }
 
 
-        StringBuffer notifyUrl = new StringBuffer().append(getDoamin()).append("/").append(classPath);
+        StringBuffer notifyUrl = new StringBuffer().append(getDoamin()).append("/app/").append(classPath);
+        return switch (payWay) {
+            case PayWayEnum.ALIPAY -> {
+//                    APP端支付宝
+                if (!aliPayService.isEnable()) {
+                    yield R.error(500, "支付宝支付未启用");
+                }
+                notifyUrl.append("/aliNotify");
+                try {
 
+                    String orderByAliApp = aliPayService.create(info, CoolSecurityUtil.getCurrentUserId(), notifyUrl.toString(), "");
 
-        return switch (payTerminal) {
-            case PayTerminalEnum.MP_WECHAT -> {
-//                小程序端只支持微信支付
-                if (!wxPayService.isEnable()) {
-                    yield R.error(500, "微信支付未启用");
+                    yield R.ok(orderByAliApp);
+                } catch (AlipayApiException e) {
+                    yield R.error(503, e.getMessage());
                 }
 
-                WxPayMpOrderResult orderByMini = wxPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() , "");
 
-                yield R.ok(orderByMini);
             }
-            case PayTerminalEnum.APP -> switch (payWay) {
-                case PayWayEnum.WECHAT -> {
+            case PayWayEnum.WECHAT -> switch (payTerminal) {
+                case PayTerminalEnum.MP_WECHAT -> {
+                    if (!wxPayService.isEnable()) {
+                        yield R.error(500, "微信支付未启用");
+                    }
+
+                    WxPayMpOrderResult orderByMini = wxPayService.create(info, CoolSecurityUtil.getCurrentUserId(), notifyUrl.toString(), "");
+
+                    yield R.ok(orderByMini);
+                }
+                case PayTerminalEnum.APP -> {
 //                    APP端微信支付
                     if (!wxPayService.isEnable()) {
                         yield R.error(500, "微信支付未启用");
                     }
 
                     notifyUrl.append("/wxNotify");
-                    
-                    WxPayMpOrderResult orderByApp = wxPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() , "");
+
+                    WxPayMpOrderResult orderByApp = wxPayService.create(info, CoolSecurityUtil.getCurrentUserId(), notifyUrl.toString(), "");
                     yield R.ok(orderByApp);
 
                 }
-                case PayWayEnum.ALIPAY -> {
-//                    APP端支付宝
-                    if (!aliPayService.isEnable()) {
-                        yield R.error(500, "支付宝支付未启用");
-                    }
-                    notifyUrl.append("/aliNotify");
-                    try {
-                        
-                        String orderByAliApp = aliPayService.create( info , CoolSecurityUtil.getCurrentUserId() , notifyUrl.toString() , "");
-
-                        yield R.ok(orderByAliApp);
-                    } catch (AlipayApiException e) {
-                        yield R.error(503, e.getMessage());
-                    }
-
-
-                }
-                default -> R.error(400 , "参数错误或暂不支持的支付方式");
+                default -> R.error(400, "参数错误或暂不支持的支付方式");
             };
-            //  TODO: 多端支付
-            case PayTerminalEnum.H5 ->  R.error(400 , "暂不支持H5支付");
-            case PayTerminalEnum.WOA -> R.error(400 , "暂不支持公众号支付");
-            case PayTerminalEnum.PC ->  R.error(400 , "暂不支持网页支付");
-            default -> R.error(400 , "参数错误或暂不支持的支付方式");
+            default -> throw new IllegalStateException("Unexpected value: " + payWay);
         };
 
     }
