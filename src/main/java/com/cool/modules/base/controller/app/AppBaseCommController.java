@@ -8,19 +8,17 @@ import com.cool.core.eps.CoolEps;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.file.FileUploadStrategyFactory;
 import com.cool.core.request.R;
+import com.cool.modules.base.entity.sys.BaseSysParamEntity;
 import com.cool.modules.base.service.sys.BaseSysParamService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -44,10 +42,71 @@ public class AppBaseCommController {
     @GetMapping("/param")
     public R param(@RequestAttribute() JSONObject requestParams) {
         String key = requestParams.get("key", String.class);
-        List<String> allowKeys = coolProperties.getSysParam().getAllowKeys();
-        CoolPreconditions.check(!allowKeys.contains(key), "非法操作");
-        return R.ok(baseSysParamService.dataByKey(key));
+        BaseSysParamEntity byKey = baseSysParamService.getByKey(key);
+        CoolPreconditions.checkEmpty(byKey, "非法操作");
+        CoolPreconditions.check(!byKey.getOpen(), "非法操作");
+        return R.ok(byKey.getData());
     }
+
+    @TokenIgnore
+    @Operation(summary = "参数配置")
+    @GetMapping("/page/{key}")
+    public String page(@PathVariable("key") String key) {
+        BaseSysParamEntity byKey = baseSysParamService.getByKey(key);
+        CoolPreconditions.checkEmpty(byKey, "非法操作");
+        CoolPreconditions.check(!byKey.getOpen(), "非法操作");
+        return """
+                <!DOCTYPE html><html lang=en><title>"""
+                + byKey.getName() +
+                """
+                        </title> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"/>
+                        <style>
+                            * {
+                                box-sizing: border-box;
+                                margin: 0;
+                                padding: 0;
+                            }
+                        
+                            .text {
+                                word-wrap: break-word;
+                                overflow-wrap: break-word;
+                                word-break: break-word;
+                                white-space: normal;
+                                font-family: Simsun;
+                                width: 100%;
+                                max-width: 100vw;
+                            }
+                        
+                            .text a {
+                                display: inline;
+                            }
+                        
+                            img {
+                                max-width: 100vw;
+                                height: auto;
+                            }
+                        
+                            p {
+                                text-indent: 2em;
+                            }
+                        
+                            .ql-align-center {
+                                text-indent: 0em;
+                            }
+                        
+                        </style>
+                        
+                        <body style="width: 100vw;">
+                        <div class="body text" style="line-height: 4vw; font-size: 4vw;">
+                        """
+                + byKey.getData() +
+                """
+                        </div>
+                        </body>
+                        </html>
+                        """;
+    }
+
 
     @TokenIgnore
     @Operation(summary = "实体信息与路径", description = "系统所有的实体信息与路径，供前端自动生成代码与服务")
@@ -58,9 +117,9 @@ public class AppBaseCommController {
 
 
     @Operation(summary = "文件上传")
-    @PostMapping(value = "/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.ALL_VALUE })
+    @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.ALL_VALUE})
     public R upload(@RequestPart(value = "file", required = false) @Parameter(description = "文件") MultipartFile[] files,
-        HttpServletRequest request) {
+                    HttpServletRequest request) {
         return R.ok(fileUploadStrategyFactory.upload(files, request));
     }
 

@@ -22,4 +22,12 @@ public interface BaseSysParamService extends BaseService<BaseSysParamEntity> {
      * @return 数据
      */
     String dataByKey(String key);
+
+    /**
+     * 根据key获得数据
+     *
+     * @param key 键
+     * @return 数据
+     */
+    BaseSysParamEntity getByKey(String key);
 }

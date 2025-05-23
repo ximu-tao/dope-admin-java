@@ -27,4 +27,7 @@ public class BaseSysParamEntity extends BaseEntity<BaseSysParamEntity> {
 
     @ColumnDefine(comment = "备注")
     private String remark;
+    
+    @ColumnDefine(comment = "允许公开的参数")
+    private Boolean open;
 }

@@ -42,6 +42,20 @@ public class BaseSysParamServiceImpl extends BaseServiceImpl<BaseSysParamMapper,
         }
         return null;
     }
+    
+    @Override
+    public BaseSysParamEntity getByKey(String key){
+        BaseSysParamEntity baseSysParamEntity = coolCache.get(key, BaseSysParamEntity.class);
+        if (baseSysParamEntity == null) {
+            baseSysParamEntity = getOne(
+                QueryWrapper.create().eq(BaseSysParamEntity::getKeyName, key));
+        }
+        if (baseSysParamEntity != null) {
+            coolCache.set("param:" + baseSysParamEntity.getKeyName(), baseSysParamEntity);
+            return baseSysParamEntity;
+        }
+        return null;
+    }
 
     @Override
     public void modifyAfter(JSONObject requestParams, BaseSysParamEntity baseSysParamEntity) {
