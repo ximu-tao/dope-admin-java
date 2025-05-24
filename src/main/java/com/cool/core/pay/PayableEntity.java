@@ -1,11 +1,12 @@
 package com.cool.core.pay;
 
 import com.cool.core.base.BelongingUserEntity;
+import com.mybatisflex.core.activerecord.MapperModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public interface PayableEntity extends BelongingUserEntity {
+public interface PayableEntity<T> extends BelongingUserEntity ,MapperModel<T> {
     
     /**
      * 设置支付状态

@@ -1,12 +1,8 @@
-package com.cool.core.base;
+package com.cool.core.pay;
 
 import cn.hutool.core.util.RandomUtil;
-import com.cool.core.pay.PayableEntity;
 
-public interface BasePaymentService {
-    
-    Object create(PayableEntity entity, Long payerId, String notifyUrl , String returnUrl) throws Exception;
-    
+public interface BasePaymentService extends PayWayService{
     
     /**
     * 生成订单号，基于时间戳+唯一字符串+随机数+可选的子ID

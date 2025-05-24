@@ -7,7 +7,7 @@ import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.query.QueryWrapper;
 
 
-public class PayableServiceAdapter<M extends BaseMapper<T>, T extends BaseEntity<T> & PayableEntity> extends BaseServiceImpl<M, T> implements BaseService<T>, PayableService<T> {
+public class PayableServiceAdapter<M extends BaseMapper<T>, T extends BaseEntity<T> & PayableEntity<T>> extends BaseServiceImpl<M, T> implements BaseService<T>, PayableService<T> {
 
 
     @Override

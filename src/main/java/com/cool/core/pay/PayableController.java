@@ -1,37 +1,30 @@
 package com.cool.core.pay;
 
-import cn.hutool.json.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.cool.core.annotation.NoRepeatSubmit;
 import com.cool.core.annotation.TokenIgnore;
 import com.cool.core.base.AppController;
 import com.cool.core.base.BaseEntity;
 import com.cool.core.enums.PayStatusEnum;
-import com.cool.core.enums.PayTerminalEnum;
-import com.cool.core.enums.PayWayEnum;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.R;
 import com.cool.core.util.ConvertUtil;
 import com.cool.core.util.CoolSecurityUtil;
-import com.cool.modules.user.service.UserOauthService;
-import com.cool.plugin.AliPayService;
-import com.cool.plugin.WxPayService;
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
-import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
-import com.github.binarywang.wxpay.exception.WxPayException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -44,21 +37,12 @@ import java.util.Map;
  * @param <S>
  * @param <T>
  */
-public abstract class PayableController<S extends PayableService<T>, T extends BaseEntity<T> & PayableEntity > extends AppController<S, T> {
+public abstract class PayableController<S extends PayableService<T>, T extends BaseEntity<T> & PayableEntity<T> > extends AppController<S, T> {
 
     private static final Logger log = LoggerFactory.getLogger(PayableController.class);
 
-    private final WxPayService wxPayService;
-
-    private final AliPayService aliPayService;
-
-    private final UserOauthService userOauthService;
-
-    protected PayableController(WxPayService wxPayService, AliPayService aliPayService, UserOauthService userOauthService) {
-        this.wxPayService = wxPayService;
-        this.aliPayService = aliPayService;
-        this.userOauthService = userOauthService;
-    }
+    @Autowired
+    private ApplicationContext context;
 
         
     @Operation(summary = "创建订单", description = "创建订单后使用返回ID值调用同目录 pay 接口")
@@ -67,7 +51,7 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         Long userId = CoolSecurityUtil.getCurrentUserId();
         requestParams.setUserId(userId);
 
-        Long add = service.add(requestParams);
+        Long add = this.getService().add(requestParams);
         return R.ok(requestParams);
     }
 
@@ -75,8 +59,8 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         
     @Operation(summary = "关闭订单", description = "关闭订单，默认仅支持ID参数")
     @PostMapping("/close")
-    protected R<Boolean> close( @RequestBody T entity){
-        T info = service.info( entity.getId() , null );
+    public R<Boolean> close( @RequestBody T entity){
+        T info = this.getService().info( entity.getId() , null );
         CoolPreconditions.checkEmpty(info , "找不到订单");
         
         if ( PayStatusEnum.PAYED.equals( info.getPayStatus() ) ){
@@ -85,10 +69,10 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         
         info.setPayStatus( PayStatusEnum.CANCEL );
 
-        boolean update = service.update(info);
+        boolean update = this.getService().update(info);
         if (update){
             try {
-                service.close( info );
+                this.getService().close( info );
             }catch (Exception e){}
         }
 
@@ -117,14 +101,14 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
     @Operation(summary = "支付", description = "支付")
     @PostMapping("/pay")
     @NoRepeatSubmit
-    protected R pay( @Valid @RequestBody PayInfo pay ) throws Exception {
+    public R pay( @Valid @RequestBody PayInfo pay ) throws Exception {
 
         String className = this.getClass().getSimpleName();
         String classPath = ConvertUtil.extractController2Path("app", className);
 
         log.info("调用支付，ID: {}", pay.getId() );
 
-        T info = service.info( pay.getId(), null );
+        T info = this.getService().info( pay.getId(), null );
         
         CoolPreconditions.checkEmpty(info , "找不到订单");
         
@@ -140,9 +124,6 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         
         info.setPayStatus( PayStatusEnum.PAYING );
 
-        if (StringUtils.isBlank(info.getOutTradeNo())) {
-            info.setOutTradeNo(wxPayService.createOrderNum("0001"));
-        }
         
         if ( !StringUtils.isBlank(pay.getTerminal()) ) {
             info.setTerminal( pay.getTerminal() );
@@ -151,6 +132,9 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
         if ( !StringUtils.isBlank(pay.getPayWay()) ) {
             info.setPayWay( pay.getPayWay() );
         }
+        
+        PayWayService payWayService = context.getBean(info.getPayWay(), PayWayService.class);
+
 
         service.update( info);
 
@@ -166,127 +150,24 @@ public abstract class PayableController<S extends PayableService<T>, T extends B
             return R.error(400, "不支持的客户端类型");
         }
 
-
-        StringBuffer notifyUrl = new StringBuffer().append(getDoamin()).append("/app/").append(classPath);
-        return switch (payWay) {
-            case PayWayEnum.ALIPAY -> {
-//                    APP端支付宝
-                if (!aliPayService.isEnable()) {
-                    yield R.error(500, "支付宝支付未启用");
-                }
-                notifyUrl.append("/aliNotify");
-                try {
-
-                    String orderByAliApp = aliPayService.create(info, CoolSecurityUtil.getCurrentUserId(), notifyUrl.toString(), "");
-
-                    yield R.ok(orderByAliApp);
-                } catch (AlipayApiException e) {
-                    yield R.error(503, e.getMessage());
-                }
+        String notifyUrl = getDoamin() + "/app/" + classPath + "/notify/" + payWay;
 
 
-            }
-            case PayWayEnum.WECHAT -> switch (payTerminal) {
-                case PayTerminalEnum.MP_WECHAT -> {
-                    if (!wxPayService.isEnable()) {
-                        yield R.error(500, "微信支付未启用");
-                    }
-
-                    WxPayMpOrderResult orderByMini = wxPayService.create(info, CoolSecurityUtil.getCurrentUserId(), notifyUrl.toString(), "");
-
-                    yield R.ok(orderByMini);
-                }
-                case PayTerminalEnum.APP -> {
-//                    APP端微信支付
-                    if (!wxPayService.isEnable()) {
-                        yield R.error(500, "微信支付未启用");
-                    }
-
-                    notifyUrl.append("/wxNotify");
-
-                    WxPayMpOrderResult orderByApp = wxPayService.create(info, CoolSecurityUtil.getCurrentUserId(), notifyUrl.toString(), "");
-                    yield R.ok(orderByApp);
-
-                }
-                default -> R.error(400, "参数错误或暂不支持的支付方式");
-            };
-            default -> throw new IllegalStateException("Unexpected value: " + payWay);
-        };
-
+        Object o = payWayService.create(info, CoolSecurityUtil.getCurrentUserId(), notifyUrl, "", this.getService());
+        return R.ok(o);
     }
-
-
+    
     @Operation(summary = "支付回调通知处理")
-    @PostMapping("/wxNotify")
+    @PostMapping("/notify/{source}")
     @TokenIgnore
-    public String wxNotify(@RequestBody String xmlData) {
-        try {
-            // 解析微信支付的回调数据
-            WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(xmlData);
-
-            String outTradeNo = notifyResult.getOutTradeNo(); // 商户订单号
-            // 检查支付结果
-            if ("SUCCESS".equals(notifyResult.getResultCode())) {
-                // 支付成功的逻辑处理
-                log.info("微信支付成功，订单号: {}", outTradeNo);
-
-                
-                T order = service.getByOutTradeNo( outTradeNo );
-                order.setPayStatus(PayStatusEnum.PAYED );
-                order.setPayTime( LocalDateTime.now() );
-                service.update( order );
-                
-
-                service.payNotice(outTradeNo);
-
-
-                return WxPayNotifyResponse.success("success"); // 返回给微信支付处理结果
-            } else {
-                log.error("微信支付失败，订单号: {}", outTradeNo);
-                return WxPayNotifyResponse.fail("fail");
-            }
-        } catch (Exception e) {
-            log.error("微信支付回调处理异常: {}", e.getMessage(), e);
-            return WxPayNotifyResponse.fail("fail");
-        }
+    public Object notify(HttpServletRequest request , HttpServletResponse response , @PathVariable("source") String source ) throws Exception {
+        
+        PayWayService payWayService = context.getBean( source , PayWayService.class);
+        
+        return payWayService.notify( request , response , this.getService() );
+        
     }
 
-    @Operation(summary = "支付回调通知处理")
-    @PostMapping("/aliNotify")
-    @TokenIgnore
-    public String aliNotify(@RequestParam Map<String, String> params) throws IOException {
 
-        if (params.get("trade_status").equals("TRADE_SUCCESS")) {
-
-            try {
-
-                /**
-                 *  TODO：不知道为啥验签结果总是 false，
-                 *  可能是因为被我去除支付宝依赖冲突
-                 *     <groupId>org.bouncycastle</groupId>
-                 *     <artifactId>bcprov-jdk15on</artifactId>
-                 *     暂时不管验证结果
-                 */
-//                
-                aliPayService.verifyNotify(params);
-            } catch (AlipayApiException e) {
-                return e.getMessage();
-            }
-            
-            
-
-            T order = service.getByOutTradeNo(params.get("out_trade_no"));
-            order.setPayStatus(PayStatusEnum.PAYED );
-            order.setPayTime( LocalDateTime.now() );
-            service.update( order) ;
-                
-            
-
-//            业务通知
-            service.payNotice(params.get("out_trade_no"));
-
-        }
-        return "success";
-    }
 
 }

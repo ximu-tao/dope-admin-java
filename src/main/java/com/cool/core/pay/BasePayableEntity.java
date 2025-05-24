@@ -11,7 +11,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public abstract class BasePayableEntity<T extends BaseEntity<T>> extends BaseEntity<T> implements PayableEntity, BelongingUserEntity {
+public abstract class BasePayableEntity<T extends BaseEntity<T>> extends BaseEntity<T> implements PayableEntity<T>, BelongingUserEntity {
     
     @Column(comment = "用户ID")
     @Schema( description = "用户ID（无需提交）")
