@@ -1,5 +1,6 @@
 package com.cool.core.pay.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.AlipayConstants;
@@ -28,7 +29,7 @@ import java.util.Map;
 
 
 @Service(PayWayEnum.ALIPAY)
-public class AliPayService implements BasePaymentService {
+public class AliPayServiceImpl implements BasePaymentService {
 
 
     @Getter
@@ -38,7 +39,7 @@ public class AliPayService implements BasePaymentService {
 
     private AlipayConfig alipayConfig = new AlipayConfig();
 
-    AliPayService(PluginInfoService pluginInfoService) throws AlipayApiException {
+    AliPayServiceImpl(PluginInfoService pluginInfoService) throws AlipayApiException {
         try {
 
             PluginInfoEntity byKey = pluginInfoService.getByKey("pay-ali");
@@ -110,6 +111,15 @@ public class AliPayService implements BasePaymentService {
 
     @Override
     public Object create(PayableEntity entity, Long payerId, String notifyUrl, String returnUrl, PayableService<?> service) throws AlipayApiException {
+        
+        
+        if (ObjectUtil.isEmpty( entity.getOutTradeNo() )) {
+            entity.setOutTradeNo( BasePaymentService.createOrderNum("o") );
+            entity.updateById();
+        }
+        
+        
+        
         // 构造请求参数以调用接口
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();

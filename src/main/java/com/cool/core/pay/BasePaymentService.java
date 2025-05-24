@@ -1,6 +1,6 @@
 package com.cool.core.pay;
 
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.IdUtil;
 
 public interface BasePaymentService extends PayWayService{
     
@@ -10,11 +10,8 @@ public interface BasePaymentService extends PayWayService{
     * @param subId 可选，如你的订单ID, 或者用户ID的一些组合
     * @return 订单号
     */
-    default String createOrderNum( String subId ) {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String randomString = RandomUtil.randomString(8);
-        int randomNumber = 666;
-        return timestamp + randomString + randomNumber + (subId != null ? subId : "");
+    static String createOrderNum( String subId ) {
+        return subId+IdUtil.getSnowflake().nextIdStr();
     }
     
 }

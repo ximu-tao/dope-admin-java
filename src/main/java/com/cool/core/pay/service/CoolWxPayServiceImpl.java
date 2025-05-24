@@ -1,6 +1,8 @@
 package com.cool.core.pay.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.cool.core.enums.PayStatusEnum;
+import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.pay.BasePaymentService;
 import com.cool.core.pay.PayableEntity;
 import com.cool.core.enums.PayTerminalEnum;
@@ -17,6 +19,7 @@ import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
+import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,7 +32,7 @@ import java.util.Map;
 
 @Slf4j
 @Service( PayWayEnum.WECHAT )
-public class WxPayService extends WxPayServiceImpl implements BasePaymentService {
+public class CoolWxPayServiceImpl extends WxPayServiceImpl implements BasePaymentService {
 
     @Getter
     private Boolean enable = false;
@@ -38,7 +41,7 @@ public class WxPayService extends WxPayServiceImpl implements BasePaymentService
     
     private final UserOauthService userOauthService;
     
-    public WxPayService(PluginInfoService pluginInfoService, UserOauthService userOauthService) {
+    public CoolWxPayServiceImpl(PluginInfoService pluginInfoService, UserOauthService userOauthService) {
         this.userOauthService = userOauthService;
         try {
             
@@ -117,6 +120,12 @@ public class WxPayService extends WxPayServiceImpl implements BasePaymentService
 
     @Override
     public Object create(PayableEntity entity, Long payerId, String notifyUrl, String returnUrl, PayableService<?> service) throws WxPayException {
+
+        if (ObjectUtil.isEmpty( entity.getOutTradeNo() )) {
+            entity.setOutTradeNo( BasePaymentService.createOrderNum("o") );
+            entity.updateById();
+        }
+        
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody( entity.getBody() );
         orderRequest.setOutTradeNo( entity.getOutTradeNo() );
@@ -126,10 +135,14 @@ public class WxPayService extends WxPayServiceImpl implements BasePaymentService
         orderRequest.setNotifyUrl( notifyUrl );
         
         if (PayTerminalEnum.MP_WECHAT.equals( entity.getTerminal() )){
-            orderRequest.setOpenid( userOauthService.getOpenid( payerId , PayWayEnum.WECHAT ,  PayTerminalEnum.MP_WECHAT ) );
+            String openid = userOauthService.getOpenid(payerId, PayWayEnum.WECHAT, PayTerminalEnum.MP_WECHAT);
+            CoolPreconditions.checkEmpty( openid , "用户未绑定OpenId");
+            orderRequest.setOpenid( openid );
             orderRequest.setTradeType( WxPayConstants.TradeType.JSAPI );
         }else if ( PayTerminalEnum.APP.equals( entity.getTerminal() ) ){
             orderRequest.setTradeType( WxPayConstants.TradeType.APP );
+        }else {
+            CoolPreconditions.alwaysThrow("不支持的支付渠道");
         }
         
         return this.createOrder( orderRequest );
