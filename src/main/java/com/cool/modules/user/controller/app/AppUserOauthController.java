@@ -48,8 +48,8 @@ public class AppUserOauthController extends AppController<UserOauthService, User
     @Override
     @PostMapping("/myList")
     @Operation(summary = "分页查询我的第三方账号绑定账号", description = "")
-    protected R<PageResult<UserOauthEntity>> myList(PageParams<UserOauthEntity> pageParams, JSONObject requestParams) {
-        return super.myList(pageParams, requestParams);
+    public R<PageResult<UserOauthEntity>> myList(PageParams<UserOauthEntity> pageParams ) {
+        return super.myList( pageParams );
     }
     
     

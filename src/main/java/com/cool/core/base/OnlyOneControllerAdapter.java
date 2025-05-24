@@ -26,21 +26,21 @@ public abstract class OnlyOneControllerAdapter<S extends BaseService<T>, T exten
     @Operation(summary = "", description = "")
     @PostMapping("/add")
     @Override
-    public R<T> add(@Valid @RequestBody T params,@RequestAttribute() JSONObject requestParams) {
+    public R<T> add(@Valid @RequestBody T params ) {
         return R.error("禁止使用此接口");
     }
 
     @Operation(summary = "", description = "")
     @PostMapping("/delete")
     @Override
-    protected R<Boolean> delete( @RequestBody T t ,@RequestAttribute() JSONObject requestParams) {
+    public R<Boolean> delete( @RequestBody T t  ) {
         return R.error("禁止使用此接口");
     }
     
     @Operation(summary = "修改", description = "修改")
     @PostMapping("/update")
-    protected R<Boolean> update(@RequestBody T t,@RequestAttribute() JSONObject requestParams) {
-        R<T> tr = this.myInfo(new OneParams(), requestParams);
+    public R<Boolean> update(@RequestBody T t ) {
+        R<T> tr = this.myInfo(new OneParams() );
         t.setId( tr.getData().getId() );
         t.setUserId( CoolSecurityUtil.getCurrentUserId() );
         Boolean modify = service.update(t);
@@ -53,7 +53,7 @@ public abstract class OnlyOneControllerAdapter<S extends BaseService<T>, T exten
     @Override
     @Operation(summary = "我的数据（不需要ID参数）", description = "")
     @PostMapping("/myInfo")
-    protected R<T> myInfo( @RequestBody OneParams oneParams, @RequestAttribute() JSONObject requestParams ){
+    public R<T> myInfo( @RequestBody OneParams oneParams  ){
         
         if ( this.service instanceof OnlyOneService<?> onlyOneService){
             T o = (T) onlyOneService.infoByUserId(CoolSecurityUtil.getCurrentUserId(), oneParams.getWith());
@@ -64,7 +64,7 @@ public abstract class OnlyOneControllerAdapter<S extends BaseService<T>, T exten
         t.setUserId( CoolSecurityUtil.getCurrentUserId() );
 
         Page<T> tPage = this.service.pageWithRelationsForUser(
-                requestParams,
+                null,
                 new Page<T>(1, 1),
                 QueryWrapper.create(t), 
                 oneParams.getWith(),
