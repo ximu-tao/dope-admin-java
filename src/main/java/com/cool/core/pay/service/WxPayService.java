@@ -1,24 +1,34 @@
-package com.cool.plugin;
+package com.cool.core.pay.service;
 
-import com.cool.core.base.BasePaymentService;
+import com.cool.core.enums.PayStatusEnum;
+import com.cool.core.pay.BasePaymentService;
 import com.cool.core.pay.PayableEntity;
 import com.cool.core.enums.PayTerminalEnum;
 import com.cool.core.enums.PayWayEnum;
+import com.cool.core.pay.PayableService;
+import com.cool.core.util.BodyReaderHttpServletRequestWrapper;
 import com.cool.modules.plugin.entity.PluginInfoEntity;
 import com.cool.modules.plugin.service.PluginInfoService;
 import com.cool.modules.user.service.UserOauthService;
+import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
-@Service
+@Slf4j
+@Service( PayWayEnum.WECHAT )
 public class WxPayService extends WxPayServiceImpl implements BasePaymentService {
 
     @Getter
@@ -106,7 +116,7 @@ public class WxPayService extends WxPayServiceImpl implements BasePaymentService
 
 
     @Override
-    public WxPayMpOrderResult create(PayableEntity entity, Long payerId, String notifyUrl, String returnUrl) throws WxPayException {
+    public Object create(PayableEntity entity, Long payerId, String notifyUrl, String returnUrl, PayableService<?> service) throws WxPayException {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody( entity.getBody() );
         orderRequest.setOutTradeNo( entity.getOutTradeNo() );
@@ -123,5 +133,54 @@ public class WxPayService extends WxPayServiceImpl implements BasePaymentService
         }
         
         return this.createOrder( orderRequest );
+    }
+    
+
+    @Override
+    public Object notify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service) throws Exception {
+        
+        BodyReaderHttpServletRequestWrapper requestWrapper = new BodyReaderHttpServletRequestWrapper(request);
+        String body = requestWrapper.getBodyString(requestWrapper);
+        
+        
+        try {
+            // 解析微信支付的回调数据
+            WxPayOrderNotifyResult notifyResult = this.parseOrderNotifyResult(body);
+
+            String outTradeNo = notifyResult.getOutTradeNo(); // 商户订单号
+            // 检查支付结果
+            if ("SUCCESS".equals(notifyResult.getResultCode())) {
+                // 支付成功的逻辑处理
+                log.info("微信支付成功，订单号: {}", outTradeNo);
+                
+                PayableEntity<?> order = service.getByOutTradeNo(outTradeNo);
+                order.setPayStatus(PayStatusEnum.PAYED );
+                order.setPayTime( LocalDateTime.now() );
+                order.updateById();
+                
+                service.payNotice(outTradeNo);
+                
+                return WxPayNotifyResponse.success("success"); // 返回给微信支付处理结果
+            } else {
+                log.error("微信支付失败，订单号: {}", outTradeNo);
+                return WxPayNotifyResponse.fail("fail");
+            }
+        } catch (Exception e) {
+            log.error("微信支付回调处理异常: {}", e.getMessage(), e);
+            return WxPayNotifyResponse.fail("fail");
+        }
+        
+        
+        
+    }
+
+    @Override
+    public String parseOutTradeNo(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service) throws Exception {
+        return "";
+    }
+
+    @Override
+    public Boolean verify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service, PayableEntity entity) throws Exception {
+        return null;
     }
 }
