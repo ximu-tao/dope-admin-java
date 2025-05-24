@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Data
 @Schema( description = "会员开通订单")
 @Table(value = "user_vip_order", comment = "会员订单")
-public class UserVipOrderEntity extends BasePayableEntity<UserVipOrderEntity> implements PayableEntity, BelongingUserEntity {
+public class UserVipOrderEntity extends BasePayableEntity<UserVipOrderEntity> implements PayableEntity<UserVipOrderEntity>, BelongingUserEntity {
     
     @ColumnDefine(comment = "价格", notNull = true)
     @Schema(hidden = true)
