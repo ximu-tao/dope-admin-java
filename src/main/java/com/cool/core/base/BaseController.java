@@ -1,38 +1,25 @@
 package com.cool.core.base;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Editor;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.cool.core.enums.QueryModeEnum;
-import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.request.CrudOption;
 import com.cool.core.request.PageResult;
-import com.cool.core.request.R;
 import com.mybatisflex.core.paginate.Page;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -170,10 +157,5 @@ public abstract class BaseController<S extends BaseService<T>, T extends BaseEnt
         return page;
     }
     
-    
-    public String getDoamin() {
-        String s = "https://" + this.request.getServerName();
-        return s;
-    }
     
 }
