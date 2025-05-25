@@ -10,7 +10,7 @@ public interface PayWayService {
      * 创建订单
      * 返回值会直接返回给客户端
      */
-    Object create(PayableEntity entity, Long payerId, String notifyUrl , String returnUrl, PayableService<?> service) throws Exception;
+    <T extends BaseEntity<T> & PayableEntity<T>> Object create(T entity, Long payerId, String notifyUrl , String returnUrl, PayableService<T> service) throws Exception;
 
     /**
      * 支付回调,返回值直接作为响应
@@ -19,11 +19,11 @@ public interface PayWayService {
      * @param service
      * @throws Exception
      */
-    default Object notify( HttpServletRequest request , HttpServletResponse httpResponse , PayableService<?> service) throws Exception{
+    default <T extends BaseEntity<T> & PayableEntity<T>>  Object notify( HttpServletRequest request , HttpServletResponse httpResponse , PayableService<T> service) throws Exception{
         
         String outTradeNo = parseOutTradeNo( request , httpResponse , service );
 
-        PayableEntity order = service.getByOutTradeNo(outTradeNo);
+        T order = service.getByOutTradeNo(outTradeNo);
         if (verify( request , httpResponse , service, order )) {
             service.payNotice( outTradeNo );
         }
@@ -31,9 +31,9 @@ public interface PayWayService {
     };
 
     
-    String parseOutTradeNo( HttpServletRequest request , HttpServletResponse httpResponse , PayableService<?> service) throws Exception;
+    <T extends BaseEntity<T> & PayableEntity<T>> String parseOutTradeNo( HttpServletRequest request , HttpServletResponse httpResponse , PayableService<T> service) throws Exception;
     
     
     
-    Boolean verify( HttpServletRequest request , HttpServletResponse httpResponse , PayableService<?> service, PayableEntity entity ) throws Exception;
+    <T extends BaseEntity<T> & PayableEntity<T>> Boolean verify( HttpServletRequest request , HttpServletResponse httpResponse , PayableService<T> service, T entity ) throws Exception;
 }

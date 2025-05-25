@@ -1,6 +1,7 @@
 package com.cool.core.pay.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.cool.core.base.BaseEntity;
 import com.cool.core.enums.PayStatusEnum;
 import com.cool.core.exception.CoolPreconditions;
 import com.cool.core.pay.BasePaymentService;
@@ -119,11 +120,11 @@ public class CoolWxPayServiceImpl extends WxPayServiceImpl implements BasePaymen
 
 
     @Override
-    public Object create(PayableEntity entity, Long payerId, String notifyUrl, String returnUrl, PayableService<?> service) throws WxPayException {
+    public <T extends BaseEntity<T> & PayableEntity<T>> Object create(T entity, Long payerId, String notifyUrl, String returnUrl, PayableService<T> service) throws Exception {
 
         if (ObjectUtil.isEmpty( entity.getOutTradeNo() )) {
             entity.setOutTradeNo( BasePaymentService.createOrderNum("o") );
-            entity.updateById();
+            service.update( entity );
         }
         
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
@@ -150,7 +151,7 @@ public class CoolWxPayServiceImpl extends WxPayServiceImpl implements BasePaymen
     
 
     @Override
-    public Object notify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service) throws Exception {
+    public <T extends BaseEntity<T> & PayableEntity<T>> Object notify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<T> service) throws Exception {
         
         BodyReaderHttpServletRequestWrapper requestWrapper = new BodyReaderHttpServletRequestWrapper(request);
         String body = requestWrapper.getBodyString(requestWrapper);
@@ -166,10 +167,10 @@ public class CoolWxPayServiceImpl extends WxPayServiceImpl implements BasePaymen
                 // 支付成功的逻辑处理
                 log.info("微信支付成功，订单号: {}", outTradeNo);
                 
-                PayableEntity<?> order = service.getByOutTradeNo(outTradeNo);
+                T order = service.getByOutTradeNo(outTradeNo);
                 order.setPayStatus(PayStatusEnum.PAYED );
                 order.setPayTime( LocalDateTime.now() );
-                order.updateById();
+                service.update( order );
                 
                 service.payNotice(outTradeNo);
                 
@@ -188,12 +189,12 @@ public class CoolWxPayServiceImpl extends WxPayServiceImpl implements BasePaymen
     }
 
     @Override
-    public String parseOutTradeNo(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service) throws Exception {
+    public <T extends BaseEntity<T> & PayableEntity<T>> String parseOutTradeNo(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<T> service) throws Exception {
         return "";
     }
 
     @Override
-    public Boolean verify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service, PayableEntity entity) throws Exception {
+    public <T extends BaseEntity<T> & PayableEntity<T>> Boolean verify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<T> service, T entity) throws Exception {
         return null;
     }
 }

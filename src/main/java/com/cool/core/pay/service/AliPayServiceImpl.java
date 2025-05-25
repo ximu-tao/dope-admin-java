@@ -110,12 +110,12 @@ public class AliPayServiceImpl implements BasePaymentService {
     }
 
     @Override
-    public Object create(PayableEntity entity, Long payerId, String notifyUrl, String returnUrl, PayableService<?> service) throws AlipayApiException {
+    public <T extends BaseEntity<T> & PayableEntity<T>> Object create(T entity, Long payerId, String notifyUrl, String returnUrl, PayableService<T> service) throws AlipayApiException {
         
         
         if (ObjectUtil.isEmpty( entity.getOutTradeNo() )) {
             entity.setOutTradeNo( BasePaymentService.createOrderNum("o") );
-            entity.updateById();
+            service.update(entity);
         }
         
         
@@ -162,7 +162,7 @@ public class AliPayServiceImpl implements BasePaymentService {
     }
     
     @Override
-    public Object notify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service) throws Exception {
+    public <T extends BaseEntity<T> & PayableEntity<T>> Object notify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<T> service) throws Exception {
         Map<String, String> params = convertRequestParamsToMap( request );
 
         if (params.get("trade_status").equals("TRADE_SUCCESS")) {
@@ -181,10 +181,10 @@ public class AliPayServiceImpl implements BasePaymentService {
                 CoolPreconditions.alwaysThrow(e.getMessage());
             }
 
-            PayableEntity<?> order = service.getByOutTradeNo(params.get("out_trade_no"));
+            T order = service.getByOutTradeNo(params.get("out_trade_no"));
             order.setPayStatus(PayStatusEnum.PAYED);
             order.setPayTime(LocalDateTime.now());
-            order.updateById();
+            service.update( order );
             service.payNotice(params.get("out_trade_no"));
 
         }
@@ -194,12 +194,12 @@ public class AliPayServiceImpl implements BasePaymentService {
     }
 
     @Override
-    public String parseOutTradeNo(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service) throws Exception {
+    public <T extends BaseEntity<T> & PayableEntity<T>> String parseOutTradeNo(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<T> service) throws Exception {
         return "";
     }
 
     @Override
-    public Boolean verify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<?> service, PayableEntity entity) throws Exception {
+    public <T extends BaseEntity<T> & PayableEntity<T>> Boolean verify(HttpServletRequest request, HttpServletResponse httpResponse, PayableService<T> service, T entity) throws Exception {
         return null;
     }
 
