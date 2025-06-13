@@ -86,7 +86,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
             return allField;
         }
 
-        return allField = Arrays.stream(this.getAllDeclaredFields(entityClass))
+        return allField = Arrays.stream(this.getAllDeclaredFields( this.currentEntityClass() ))
                 .filter(field -> {
                     ColumnDefine fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, ColumnDefine.class);
                     return fieldInfo != null;
