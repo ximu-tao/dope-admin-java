@@ -18,7 +18,7 @@ public interface AppPageController<S extends BaseService<T>, T extends BaseEntit
     @TokenIgnore
     @Operation(summary = "分页查询数据", description = "")
     @PostMapping("/page")
-    default R<PageResult<T>> list(@Valid @RequestBody PageParams<T> pageParams) {
+    default R<PageResult<T>> page(@Valid @RequestBody PageParams<T> pageParams) {
 
         Page<T> TPage = this.getService().pageWithRelations(null, pageParams.toPage(), getService().buildAppQueryWrapper(pageParams), pageParams.getWith());
 

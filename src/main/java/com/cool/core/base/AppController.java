@@ -12,7 +12,7 @@ public abstract class AppController<S extends BaseService<T>, T extends BaseEnti
         AppMyInfoController<S, T>,
         AppPageController<S, T>,
         AppMyListController<S, T>,
-        AppListsController<S, T> {
+        AppListController<S, T> {
     @Override
     protected void init(HttpServletRequest request, JSONObject requestParams) {
     }
