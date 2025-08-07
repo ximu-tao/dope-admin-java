@@ -10,7 +10,7 @@ public abstract class AppController<S extends BaseService<T>, T extends BaseEnti
         AppUpdateController<S, T>,
         AppInfoController<S, T>,
         AppMyInfoController<S, T>,
-        AppListController<S, T>,
+        AppPageController<S, T>,
         AppMyListController<S, T>,
         AppListsController<S, T> {
     @Override
