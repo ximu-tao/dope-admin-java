@@ -17,6 +17,21 @@ public @interface EpsField {
      */
     String component() default AdminComponentsEnum.INPUT;
 
+    EpsFieldDict[] dict() default {};
+
+    @interface EpsFieldDict{
+
+        String key();
+
+
+        String value() default "";
+
+        /**
+         * 显示效果，可选：info、success、danger、warning
+         */
+        String type() default "info";
+    }
+
     /**
      * 排除 EQ 查询条件
      * @return

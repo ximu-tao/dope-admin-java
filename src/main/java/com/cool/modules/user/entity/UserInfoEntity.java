@@ -1,5 +1,6 @@
 package com.cool.modules.user.entity;
 
+import com.cool.core.annotation.EpsField;
 import com.cool.core.base.BaseEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.RelationOneToOne;
@@ -36,7 +37,12 @@ public class UserInfoEntity extends BaseEntity<UserInfoEntity> {
     @ColumnDefine(comment = "状态 0-禁用 1-正常 2-已注销", defaultValue = "1")
     private Integer status;
 
-    @ColumnDefine(comment = "登录方式 0-小程序 1-公众号 2-H5", defaultValue = "0")
+    @EpsField( dict = {
+            @EpsField.EpsFieldDict(value = "小程序", key = "0"),
+            @EpsField.EpsFieldDict(value = "公众号", key = "1"),
+            @EpsField.EpsFieldDict(value = "H5", key = "2"),
+    })
+    @ColumnDefine(comment = "登录方式 0-小程序 1- 2-H5", defaultValue = "0")
     private String loginType;
 
     @ColumnDefine(comment = "密码")
