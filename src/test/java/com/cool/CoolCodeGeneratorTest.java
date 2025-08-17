@@ -11,7 +11,7 @@ public class CoolCodeGeneratorTest {
     public static void main(String[] args) {
         CodeGenerator codeGenerator = new CodeGenerator();
         codeGenerator.init();
-        List<Class> list = List.of(UserWxEntity.class);
+        List<Class> list = List.of(UserOauthEntity.class);
 
         list.forEach(o -> {
             Table annotation = (Table) o.getAnnotation(Table.class);
