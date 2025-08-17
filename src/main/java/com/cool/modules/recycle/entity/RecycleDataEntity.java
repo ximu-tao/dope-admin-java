@@ -4,7 +4,7 @@ import com.cool.core.base.BaseEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Table;
 import com.cool.core.mybatis.handler.Fastjson2TypeHandler;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -20,26 +20,26 @@ import org.dromara.autotable.annotation.Index;
 @Table(value = "recycle_data", comment = "数据回收站表")
 public class RecycleDataEntity extends BaseEntity<RecycleDataEntity> {
 
-    @ColumnDefine(comment = "表信息", type = "json")
+    @AutoColumn(comment = "表信息", type = "json")
     @Column(typeHandler = Fastjson2TypeHandler.class)
     private EntityInfo entityInfo;
 
     @Index()
-    @ColumnDefine(comment = "操作人", notNull = true)
+    @AutoColumn(comment = "操作人", notNull = true)
     private Long userId;
 
-    @ColumnDefine(comment = "被删除的数据", type = "json")
+    @AutoColumn(comment = "被删除的数据", type = "json")
     @Column(typeHandler = Fastjson2TypeHandler.class)
     private List<Object> data;
 
-    @ColumnDefine(comment = "请求的接口", notNull = true)
+    @AutoColumn(comment = "请求的接口", notNull = true)
     private String url;
 
-    @ColumnDefine(comment = "请求参数", type = "json", notNull = true)
+    @AutoColumn(comment = "请求参数", type = "json", notNull = true)
     @Column(typeHandler = Fastjson2TypeHandler.class)
     private Map<String, Object> params;
 
-    @ColumnDefine(comment = "删除数据条数", defaultValue = "1")
+    @AutoColumn(comment = "删除数据条数", defaultValue = "1")
     private Integer count;
 
     @Setter

@@ -6,7 +6,7 @@ import com.cool.core.base.BelongingUserEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.handler.Fastjson2TypeHandler;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import com.tangzc.mybatisflex.autotable.annotation.UniIndex;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -19,25 +19,25 @@ import java.util.Map;
 @Schema( description = "第三方绑定信息")
 public class UserOauthEntity extends BaseEntity<UserOauthEntity> implements BelongingUserEntity {
     
-    @ColumnDefine(comment = "绑定的用户ID，为0表示未绑定用户", notNull = true)
+    @AutoColumn(comment = "绑定的用户ID，为0表示未绑定用户", notNull = true)
     private Long userId;
     
-    @ColumnDefine(comment = "厂商", notNull = true)
+    @AutoColumn(comment = "厂商", notNull = true)
     private String provider;
     
-    @ColumnDefine(comment = "平台", notNull = true)
+    @AutoColumn(comment = "平台", notNull = true)
     private String platform;
 
     @UniIndex
-    @ColumnDefine(comment = "第三方unionid")
+    @AutoColumn(comment = "第三方unionid")
     private String unionid;
 
     @UniIndex
-    @ColumnDefine(comment = "第三方openid", notNull = true)
+    @AutoColumn(comment = "第三方openid", notNull = true)
     private String openid;
 
 
-    @ColumnDefine(comment = "其他扩展数据", type = "json", notNull = true)
+    @AutoColumn(comment = "其他扩展数据", type = "json", notNull = true)
     @Column(typeHandler = Fastjson2TypeHandler.class)
     private Map<String,Object> extend;
 }

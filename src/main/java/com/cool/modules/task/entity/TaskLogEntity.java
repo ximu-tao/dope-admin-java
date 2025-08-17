@@ -3,7 +3,7 @@ package com.cool.modules.task.entity;
 import com.cool.core.base.BaseEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Table;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import lombok.Getter;
 import lombok.Setter;
 import org.dromara.autotable.annotation.Index;
@@ -14,13 +14,13 @@ import org.dromara.autotable.annotation.Index;
 public class TaskLogEntity extends BaseEntity<TaskLogEntity> {
 
     @Index
-    @ColumnDefine(comment = "任务ID", notNull = true, type = "bigint")
+    @AutoColumn(comment = "任务ID", notNull = true, type = "bigint")
     private Long taskId;
 
-    @ColumnDefine(comment = "状态 0：失败 1：成功", defaultValue = "0")
+    @AutoColumn(comment = "状态 0：失败 1：成功", defaultValue = "0")
     private Integer status;
 
-    @ColumnDefine(comment = "详情", type = "text")
+    @AutoColumn(comment = "详情", type = "text")
     private String detail;
 
     // 任务名称
