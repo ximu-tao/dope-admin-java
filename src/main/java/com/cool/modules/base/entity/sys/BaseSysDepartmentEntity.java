@@ -3,7 +3,7 @@ package com.cool.modules.base.entity.sys;
 import com.cool.core.base.BaseEntity;
 import com.mybatisflex.annotation.Column;
 
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import com.mybatisflex.annotation.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,13 +15,13 @@ import lombok.Setter;
 @Setter
 @Table(value = "base_sys_department", comment = "系统部门")
 public class BaseSysDepartmentEntity extends BaseEntity<BaseSysDepartmentEntity> {
-    @ColumnDefine(comment = "部门名称", notNull = true)
+    @AutoColumn(comment = "部门名称", notNull = true)
     private String name;
 
-    @ColumnDefine(comment = "上级部门ID", type = "bigint")
+    @AutoColumn(comment = "上级部门ID", type = "bigint")
     private Long parentId;
 
-    @ColumnDefine(comment = "排序", defaultValue = "0")
+    @AutoColumn(comment = "排序", defaultValue = "0")
     private Integer orderNum;
 
     // 父菜单名称

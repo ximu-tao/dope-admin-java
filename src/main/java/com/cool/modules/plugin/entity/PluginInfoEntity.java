@@ -6,7 +6,7 @@ import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Table;
 import com.cool.core.mybatis.handler.Fastjson2TypeHandler;
 import com.cool.core.mybatis.handler.JacksonTypeHandler;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import com.tangzc.mybatisflex.autotable.annotation.UniIndex;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,40 +18,40 @@ import org.dromara.autotable.annotation.Index;
 @Table(value = "plugin_info", comment = "插件信息")
 public class PluginInfoEntity extends BaseEntity<PluginInfoEntity> {
 
-    @ColumnDefine(comment = "名称")
+    @AutoColumn(comment = "名称")
     private String name;
 
-    @ColumnDefine(comment = "简介")
+    @AutoColumn(comment = "简介")
     private String description;
 
     @UniIndex
-    @ColumnDefine(comment = "实例对象")
+    @AutoColumn(comment = "实例对象")
     private String key;
 
     @Index
-    @ColumnDefine(comment = "Hook", length = 50)
+    @AutoColumn(comment = "Hook", length = 50)
     private String hook;
 
-    @ColumnDefine(comment = "描述", type = "text")
+    @AutoColumn(comment = "描述", type = "text")
     private String readme;
 
-    @ColumnDefine(comment = "版本")
+    @AutoColumn(comment = "版本")
     private String version;
 
-    @ColumnDefine(comment = "Logo(base64)", type = "text", notNull = true)
+    @AutoColumn(comment = "Logo(base64)", type = "text", notNull = true)
     private String logo;
 
-    @ColumnDefine(comment = "作者")
+    @AutoColumn(comment = "作者")
     private String author;
 
-    @ColumnDefine(comment = "状态 0-禁用 1-启用", defaultValue = "1")
+    @AutoColumn(comment = "状态 0-禁用 1-启用", defaultValue = "1")
     private Integer status;
 
-    @ColumnDefine(comment = "插件的plugin.json", type = "json", notNull = true)
+    @AutoColumn(comment = "插件的plugin.json", type = "json", notNull = true)
     @Column(typeHandler = Fastjson2TypeHandler.class)
     private PluginJson pluginJson;
 
-    @ColumnDefine(comment = "配置", type = "json")
+    @AutoColumn(comment = "配置", type = "json")
     @Column(typeHandler = JacksonTypeHandler.class)
     private Object config;
 

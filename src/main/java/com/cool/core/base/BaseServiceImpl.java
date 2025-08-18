@@ -20,7 +20,7 @@ import com.mybatisflex.core.relation.RelationManager;
 import com.mybatisflex.core.table.TableInfo;
 import com.mybatisflex.core.table.TableInfoFactory;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
@@ -88,7 +88,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity<T>> e
 
         return allField = Arrays.stream(this.getAllDeclaredFields( this.currentEntityClass() ))
                 .filter(field -> {
-                    ColumnDefine fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, ColumnDefine.class);
+                    AutoColumn fieldInfo = AnnotatedElementUtils.findMergedAnnotation(field, AutoColumn.class);
                     return fieldInfo != null;
                 }).toList();
 

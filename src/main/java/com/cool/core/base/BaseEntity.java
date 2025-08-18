@@ -7,7 +7,7 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.core.activerecord.Model;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Getter;
@@ -23,16 +23,16 @@ public abstract class BaseEntity<T extends Model<T>> extends Model<T> implements
 
     @Id(keyType = KeyType.Auto, comment = "ID")
     @EpsField( excludeEq = true , immutable = true)
-    @ColumnDefine(comment = "ID")
+    @AutoColumn(comment = "ID")
     protected Long id;
 
     @Column(onInsertValue = "now()")
-    @ColumnDefine(comment = "创建时间")
+    @AutoColumn(comment = "创建时间")
     @EpsField( excludeEq = true , immutable = true)
     protected Date createTime;
 
     @Column(onInsertValue = "now()", onUpdateValue = "now()")
-    @ColumnDefine(comment = "更新时间")
+    @AutoColumn(comment = "更新时间")
     @EpsField( excludeEq = true , immutable = true)
     protected Date updateTime;
 

@@ -1,7 +1,7 @@
 package com.cool.core.base;
 
 import com.mybatisflex.core.activerecord.Model;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import lombok.Getter;
 import lombok.Setter;
 import org.dromara.autotable.annotation.Index;
@@ -11,6 +11,6 @@ import org.dromara.autotable.annotation.Index;
 @Setter
 public class TenantEntity<T extends Model<T>> extends BaseEntity<T> {
     @Index
-    @ColumnDefine(comment = "租户id")
+    @AutoColumn(comment = "租户id")
     protected Long tenantId;
 }

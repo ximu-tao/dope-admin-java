@@ -1,10 +1,11 @@
 package com.cool.modules.user.entity;
 
+import com.cool.core.annotation.EpsField;
 import com.cool.core.base.BaseEntity;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.RelationOneToOne;
 import com.mybatisflex.annotation.Table;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import com.tangzc.mybatisflex.autotable.annotation.UniIndex;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -16,37 +17,42 @@ import lombok.Setter;
 public class UserInfoEntity extends BaseEntity<UserInfoEntity> {
 
 
-    @ColumnDefine(comment = "头像")
+    @AutoColumn(comment = "头像")
     private String avatarUrl;
 
     @UniIndex
-    @ColumnDefine(comment = "登录用户名", length = 100 )
+    @AutoColumn(comment = "登录用户名", length = 100 )
     private String username;
     
-    @ColumnDefine(comment = "昵称")
+    @AutoColumn(comment = "昵称")
     private String nickName;
 
     @UniIndex
-    @ColumnDefine(comment = "手机号")
+    @AutoColumn(comment = "手机号")
     private String phone;
 
-    @ColumnDefine(comment = "性别 0-未知 1-男 2-女", defaultValue = "0")
+    @AutoColumn(comment = "性别 0-未知 1-男 2-女", defaultValue = "0")
     private Integer gender;
 
-    @ColumnDefine(comment = "状态 0-禁用 1-正常 2-已注销", defaultValue = "1")
+    @AutoColumn(comment = "状态 0-禁用 1-正常 2-已注销", defaultValue = "1")
     private Integer status;
 
-    @ColumnDefine(comment = "登录方式 0-小程序 1-公众号 2-H5", defaultValue = "0")
+    @EpsField( dict = {
+            @EpsField.EpsFieldDict(value = "小程序", key = "0"),
+            @EpsField.EpsFieldDict(value = "公众号", key = "1"),
+            @EpsField.EpsFieldDict(value = "H5", key = "2"),
+    })
+    @AutoColumn(comment = "登录方式 0-小程序 1- 2-H5", defaultValue = "0")
     private String loginType;
 
-    @ColumnDefine(comment = "密码")
+    @AutoColumn(comment = "密码")
     private String password;
     
     @RelationOneToOne(selfField = "id", targetField = "userId" )
     @Schema( description = "用户重要数据")
     private UserSecurityEntity securityData;
     
-    @ColumnDefine(comment = "拉黑用户")
+    @AutoColumn(comment = "拉黑用户")
     @Column( onInsertValue = "false" )
     private Boolean block;
 }

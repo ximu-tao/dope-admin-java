@@ -3,7 +3,7 @@ package com.cool.modules.user.entity;
 import com.cool.core.base.AppEntity;
 import com.cool.core.base.BelongingUserEntity;
 import com.mybatisflex.annotation.Table;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.Getter;
@@ -20,19 +20,19 @@ import java.math.BigDecimal;
 public class UserBalanceLogEntity extends AppEntity<UserBalanceLogEntity> implements BelongingUserEntity {
     
     
-    @ColumnDefine(comment = "变更前金额", notNull = true)
+    @AutoColumn(comment = "变更前金额", notNull = true)
     @Schema(description = "变更前金额")
     private BigDecimal oldBalance;
     
-    @ColumnDefine(comment = "变更金额", notNull = true)
+    @AutoColumn(comment = "变更金额", notNull = true)
     @Schema(description = "变更金额")
     private BigDecimal balance;
     
-    @ColumnDefine(comment = "变更后金额", notNull = true)
+    @AutoColumn(comment = "变更后金额", notNull = true)
     @Schema(description = "变更后金额")
     private BigDecimal newBalance;
     
-    @ColumnDefine(comment = "备注", notNull = true)
+    @AutoColumn(comment = "备注", notNull = true)
     @Schema(description = "备注")
     private String remarks;
 }

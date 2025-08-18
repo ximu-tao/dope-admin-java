@@ -18,7 +18,7 @@ import com.cool.core.config.CustomOpenApiResource;
 import com.cool.core.enums.AdminComponentsEnum;
 import com.cool.core.util.ConvertUtil;
 import com.mybatisflex.annotation.*;
-import com.tangzc.mybatisflex.autotable.annotation.ColumnDefine;
+import org.dromara.autotable.annotation.AutoColumn;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -417,7 +417,7 @@ public class CoolEps {
                 dict.set("component", epsField.component());
             }
             
-            ColumnDefine columnInfo = AnnotatedElementUtils.findMergedAnnotation(field, ColumnDefine.class);
+            AutoColumn columnInfo = AnnotatedElementUtils.findMergedAnnotation(field, AutoColumn.class);
             if (columnInfo == null) {
                 continue;
             }
